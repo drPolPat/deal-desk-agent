@@ -20,6 +20,8 @@ from deal_desk.schemas import DealAssessment
 from deal_desk.tools import READ_TOOLS
 
 OUTPUT_SCHEMA = transform_schema(DealAssessment)
+# The model must always decide contact_restricted; the Pydantic default exists only for old audit rows.
+OUTPUT_SCHEMA["required"] = [*OUTPUT_SCHEMA["required"], "contact_restricted"]
 TOOL_NAMES = {t["name"] for t in READ_TOOLS}
 
 

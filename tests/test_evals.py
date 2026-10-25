@@ -24,7 +24,7 @@ EXPECTED_RULE_FLAGS = {
     "C1_recent_activity_budget_frozen": [], "M1_scheduled_call_never_logged": [],
     "M2_auto_logged_newsletter_masks_staleness": [], "M3_only_system_activity": [],
     "Q1_tender_no_contact_period": ["stale"], "Q2_customer_requested_pause": ["stale"],
-    "D1_amount_zero": ["stale"], "D2_signed_but_still_open_past_close": ["past_close_date"],
+    "D1_amount_zero": ["stale", "missing_amount"],"D2_signed_but_still_open_past_close": ["past_close_date"],
     "H1_concern_raised_and_resolved": [], "H2_long_cycle_meeting_booked": [],
     "H3_alarming_words_harmless_context": [], "H4_was_stale_real_meeting_yesterday": [],
 }

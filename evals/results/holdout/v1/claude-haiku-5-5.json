@@ -1,0 +1,880 @@
+{
+  "summary": {
+    "model": "claude-haiku-5-5",
+    "effort": "medium",
+    "prompt_version": "v1",
+    "repeats": 3,
+    "scenarios": 4,
+    "runs": 12,
+    "skipped": 0,
+    "passed": 7,
+    "pass_rate": 0.5833333333333334,
+    "categories": {
+      "misleading_activity": {
+        "passed": 3,
+        "total": 3,
+        "pass_rate": 1.0
+      },
+      "thresholds": {
+        "passed": 3,
+        "total": 3,
+        "pass_rate": 1.0
+      },
+      "intentional_quiet": {
+        "passed": 0,
+        "total": 3,
+        "pass_rate": 0.0
+      },
+      "looks_risky_but_healthy": {
+        "passed": 1,
+        "total": 3,
+        "pass_rate": 0.3333333333333333
+      }
+    },
+    "consistency": 0.75,
+    "stable_pass": 0.5,
+    "over_caution": 0.8333333333333334,
+    "over_caution_runs": "5/6",
+    "cost_usd": 0.0108,
+    "latency_p50_ms": 6821,
+    "latency_p95_ms": 10566
+  },
+  "results": [
+    {
+      "id": "HO1_overdue_demo_no_outcome",
+      "category": "misleading_activity",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "low confidence 0.60 < 0.8"
+      ],
+      "rule_flags": [],
+      "confidence": 0.6,
+      "assessment": {
+        "opportunity_id": "006EVAL00000001",
+        "status": "at_risk",
+        "risk_reasons": [
+          "The product demo task for the operations team was due 2026-10-16 and is still 'Not Started' nine days later, so the deal's next step has stalled.",
+          "The last completed activity was the intro call on 2026-10-02, 23 days ago, and nothing has been logged since.",
+          "The opportunity NextStep still reads 'Product demo for the operations team', so the record does not reflect a rescheduled demo."
+        ],
+        "confidence": 0.6,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-10-02"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-01-20"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Product demo for the operations team"
+          },
+          {
+            "field": "activities[0].Subject",
+            "value": "Product demo with operations team"
+          },
+          {
+            "field": "activities[0].Status",
+            "value": "Not Started"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-10-16"
+          },
+          {
+            "field": "activities[1].Status",
+            "value": "Completed"
+          },
+          {
+            "field": "activities[1].ActivityDate",
+            "value": "2026-10-02"
+          }
+        ],
+        "next_step": "Call Marco Lindgren (Decision Maker) to confirm whether the operations team demo still happens and agree a specific date. If it does, bring Aisha Bello (Technical Buyer) in for the technical review. Update the demo task and NextStep in Salesforce once the date is set.",
+        "follow_up_email": {
+          "to_contact_name": "Marco Lindgren",
+          "subject": "Next steps for the Brightwater crew dispatch demo",
+          "body": "Hi Marco, following our intro call on October 2, I wanted to confirm next steps for the operations team demo. I had it on the calendar for October 16 but it has not taken place yet. Could we find 30 minutes this week to pick a date that works for your team? I'd also like to include Aisha Bello from IT if she can join for the technical review. Please let me know what suits you best. Thanks, Jordan"
+        },
+        "task_due_in_days": 2
+      },
+      "error": null,
+      "latency_ms": 7122,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 1404,
+        "cache_creation_input_tokens": 861,
+        "cache_read_input_tokens": 5232
+      },
+      "cost_usd": 0.0008625449999999999,
+      "repeat": 0
+    },
+    {
+      "id": "HO1_overdue_demo_no_outcome",
+      "category": "misleading_activity",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "low confidence 0.60 < 0.8"
+      ],
+      "rule_flags": [],
+      "confidence": 0.6,
+      "assessment": {
+        "opportunity_id": "006EVAL00000001",
+        "status": "at_risk",
+        "risk_reasons": [
+          "The product demo task scheduled for 2026-10-16 is still Not Started nine days after its due date, so the next step has stalled.",
+          "The most recent completed activity was the intro call on 2026-10-02, 23 days before today, leaving little margin before the 30-day activity window lapses.",
+          "The opportunity is still at Value Proposition with a 50% probability and no completed engagement since the intro call."
+        ],
+        "confidence": 0.6,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-10-02"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-01-20"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Value Proposition"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Product demo for the operations team"
+          },
+          {
+            "field": "activities[0].Subject",
+            "value": "Product demo with operations team"
+          },
+          {
+            "field": "activities[0].Status",
+            "value": "Not Started"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-10-16"
+          },
+          {
+            "field": "activities[1].Status",
+            "value": "Completed"
+          },
+          {
+            "field": "activities[1].ActivityDate",
+            "value": "2026-10-02"
+          },
+          {
+            "field": "opportunity.OpportunityContactRoles[0].Contact.Name",
+            "value": "Marco Lindgren"
+          }
+        ],
+        "next_step": "Jordan Reyes should call Marco Lindgren this week to confirm whether the operations demo can be rescheduled, and to confirm the decision timeline ahead of the 2027-01-20 close date. Update the demo task to completed or reschedule it, and log the outcome of the call.",
+        "follow_up_email": {
+          "to_contact_name": "Marco Lindgren",
+          "subject": "Next steps for the Brightwater crew dispatch demo",
+          "body": "Hi Marco,\n\nI wanted to follow up on the product demo for your operations team, which we had planned for mid-October and have not yet been able to hold. I would like to find a time that works for you and your team.\n\nWould you be available for a 30-minute call this week? I'd like to confirm a date for the demo and walk through the timeline you are working toward for a decision.\n\nThank you,\nJordan Reyes"
+        },
+        "task_due_in_days": 3
+      },
+      "error": null,
+      "latency_ms": 10734,
+      "tokens": {
+        "input_tokens": 10,
+        "output_tokens": 2361,
+        "cache_creation_input_tokens": 5001,
+        "cache_read_input_tokens": 6093
+      },
+      "cost_usd": 0.0018675550000000001,
+      "repeat": 1
+    },
+    {
+      "id": "HO1_overdue_demo_no_outcome",
+      "category": "misleading_activity",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "low confidence 0.60 < 0.8"
+      ],
+      "rule_flags": [],
+      "confidence": 0.6,
+      "assessment": {
+        "opportunity_id": "006EVAL00000001",
+        "status": "at_risk",
+        "risk_reasons": [
+          "The product demo task for the operations team was due 2026-10-16 and is still Not Started, so the agreed next step has slipped about nine days.",
+          "No completed activity since the intro call on 2026-10-02, and there has been no contact with the decision maker since then.",
+          "Opportunity is still in Value Proposition stage, and the open demo is the main step needed to advance it."
+        ],
+        "confidence": 0.6,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-10-02"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-01-20"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Value Proposition"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Product demo for the operations team"
+          },
+          {
+            "field": "activities[0].Subject",
+            "value": "Product demo with operations team"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-10-16"
+          },
+          {
+            "field": "activities[0].Status",
+            "value": "Not Started"
+          },
+          {
+            "field": "activities[1].Subject",
+            "value": "Intro call with Marco"
+          },
+          {
+            "field": "activities[1].Status",
+            "value": "Completed"
+          },
+          {
+            "field": "activities[1].ActivityDate",
+            "value": "2026-10-02"
+          }
+        ],
+        "next_step": "Call Marco Lindgren this week to confirm the operations demo date, reschedule it if needed, and confirm the decision timeline ahead of the 2027-01-20 close date. Update the demo task to reflect the new date.",
+        "follow_up_email": {
+          "to_contact_name": "Marco Lindgren",
+          "subject": "Scheduling the operations team demo",
+          "body": "Hi Marco,\n\nI wanted to follow up on the product demo for your operations team, which we had planned for October 16 and has not yet taken place. Could we find a time in the next week that works for you and your team?\n\nIt would also help to hear whether the timeline for a decision is still on track for early 2027. Would you have 20 minutes this week for a quick call to sort out the demo date and next steps?\n\nBest regards,\nJordan Reyes"
+        },
+        "task_due_in_days": 2
+      },
+      "error": null,
+      "latency_ms": 7319,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 1410,
+        "cache_creation_input_tokens": 3477,
+        "cache_read_input_tokens": 2616
+      },
+      "cost_usd": 0.001166385,
+      "repeat": 2
+    },
+    {
+      "id": "HO2_28_days_quiet_workshop_pending",
+      "category": "thresholds",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "human_review",
+      "reasons": [
+        "low confidence 0.75 < 0.8"
+      ],
+      "rule_flags": [],
+      "confidence": 0.75,
+      "assessment": {
+        "opportunity_id": "006EVAL00000002",
+        "status": "healthy",
+        "risk_reasons": [],
+        "confidence": 0.75,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-27"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-01-20"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Value Proposition"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Schedule technical workshop with Aisha"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-09-27"
+          },
+          {
+            "field": "activities[0].Status",
+            "value": "Completed"
+          }
+        ],
+        "next_step": "Last completed activity was 2026-09-27, about 28 days ago, so the deal is still within the 30-day window but nothing is scheduled. Jordan Reyes should book the technical workshop with Aisha Bello (IT Architect) and confirm a date with Marco Lindgren, the decision maker, before the activity window lapses.",
+        "follow_up_email": null,
+        "task_due_in_days": 3
+      },
+      "error": null,
+      "latency_ms": 6520,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 973,
+        "cache_creation_input_tokens": 3478,
+        "cache_read_input_tokens": 2616
+      },
+      "cost_usd": 0.00094801,
+      "repeat": 0
+    },
+    {
+      "id": "HO2_28_days_quiet_workshop_pending",
+      "category": "thresholds",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "human_review",
+      "reasons": [
+        "low confidence 0.70 < 0.8"
+      ],
+      "rule_flags": [],
+      "confidence": 0.7,
+      "assessment": {
+        "opportunity_id": "006EVAL00000002",
+        "status": "healthy",
+        "risk_reasons": [],
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-27"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-01-20"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Value Proposition"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Schedule technical workshop with Aisha"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-09-27"
+          },
+          {
+            "field": "activities[0].Status",
+            "value": "Completed"
+          }
+        ],
+        "next_step": "Book the technical workshop with Aisha Bello (Technical Buyer) and confirm a date, since the NextStep is still unscheduled. The last completed activity was 2026-09-27, 28 days ago, so log a completed touchpoint before the 30-day activity window lapses around 2026-10-27.",
+        "follow_up_email": null,
+        "task_due_in_days": 3
+      },
+      "error": null,
+      "latency_ms": 6173,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 862,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6094
+      },
+      "cost_usd": 0.00049254,
+      "repeat": 1
+    },
+    {
+      "id": "HO2_28_days_quiet_workshop_pending",
+      "category": "thresholds",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "human_review",
+      "reasons": [
+        "low confidence 0.70 < 0.8"
+      ],
+      "rule_flags": [],
+      "confidence": 0.7,
+      "assessment": {
+        "opportunity_id": "006EVAL00000002",
+        "status": "healthy",
+        "risk_reasons": [],
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-27"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-09-27"
+          },
+          {
+            "field": "activities[0].Status",
+            "value": "Completed"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-01-20"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Value Proposition"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Schedule technical workshop with Aisha"
+          }
+        ],
+        "next_step": "Schedule the technical workshop with Aisha Bello (Technical Buyer) and log it as an activity with a date, since the last completed activity was 2026-09-27 (28 days ago) and the agreed next step has no scheduled task yet.",
+        "follow_up_email": null,
+        "task_due_in_days": 7
+      },
+      "error": null,
+      "latency_ms": 6163,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 976,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6094
+      },
+      "cost_usd": 0.00054954,
+      "repeat": 2
+    },
+    {
+      "id": "HO3_no_contact_until_board_meets",
+      "category": "intentional_quiet",
+      "passed": false,
+      "misses": [
+        "decision auto_write not in ['human_review']"
+      ],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "auto_write",
+      "reasons": [],
+      "rule_flags": [
+        "stale"
+      ],
+      "confidence": 0.8,
+      "assessment": {
+        "opportunity_id": "006EVAL00000003",
+        "status": "at_risk",
+        "risk_reasons": [
+          "No completed activity in the last 30 days: last activity was 2026-09-15, about 40 days before today (2026-10-25).",
+          "The deal depends on a board decision on 2026-11-20, which is about four weeks before the 2026-12-18 close date, leaving little slack.",
+          "The primary decision maker asked for no calls or emails until the board meets, so the deal is paused on the customer side and still in Value Proposition at 50% probability."
+        ],
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-15"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2026-12-18"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Value Proposition"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Wait for board decision"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-09-15"
+          },
+          {
+            "field": "activities[0].Description",
+            "value": "Marco: no calls or emails until our board meets on 2026-11-20. The board decides on all new vendor contracts at that meeting."
+          },
+          {
+            "field": "opportunity.OpportunityContactRoles[0].Contact.Name",
+            "value": "Marco Lindgren"
+          }
+        ],
+        "next_step": "Do not contact Marco before the 2026-11-20 board meeting, as he requested. Before then, internally confirm the board agenda timing and prepare a post-board plan. Send the drafted email only after 2026-11-20, and if the board has decided, update the close date and stage to reflect the decision timeline.",
+        "follow_up_email": {
+          "to_contact_name": "Marco Lindgren",
+          "subject": "Brightwater meter data platform: next steps after the 20 November board meeting",
+          "body": "Hi Marco, thank you for your guidance to hold outreach until the board meets on 20 November. Once the board has reached its decision, could we set up a 30-minute call the following week to confirm the decision timeline and any remaining questions on the meter data platform? Please let me know a time that works for you, and I will work around your schedule. Best regards, Jordan Reyes"
+        },
+        "task_due_in_days": 14
+      },
+      "error": null,
+      "latency_ms": 10566,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 1935,
+        "cache_creation_input_tokens": 890,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.00113069,
+      "repeat": 0
+    },
+    {
+      "id": "HO3_no_contact_until_board_meets",
+      "category": "intentional_quiet",
+      "passed": false,
+      "misses": [
+        "decision auto_write not in ['human_review']"
+      ],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "auto_write",
+      "reasons": [],
+      "rule_flags": [
+        "stale"
+      ],
+      "confidence": 0.8,
+      "assessment": {
+        "opportunity_id": "006EVAL00000003",
+        "status": "at_risk",
+        "risk_reasons": [
+          "Last completed activity was 2026-09-15, about 40 days before today (2026-10-25), which is outside the 30-day activity window.",
+          "Marco Lindgren, the Decision Maker, asked for no calls or emails until the board meets on 2026-11-20, so outreach must wait for that date.",
+          "Board decision on 2026-11-20 leaves about four weeks before the 2026-12-18 close date, and the deal is still in Value Proposition at 50% probability with NextStep 'Wait for board decision'."
+        ],
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-15"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2026-12-18"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Value Proposition"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Wait for board decision"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-09-15"
+          },
+          {
+            "field": "activities[0].Description",
+            "value": "Marco: no calls or emails until our board meets on 2026-11-20. The board decides on all new vendor contracts at that meeting."
+          },
+          {
+            "field": "opportunity.OpportunityContactRoles[0].Contact.Name",
+            "value": "Marco Lindgren"
+          }
+        ],
+        "next_step": "Do not contact Marco before the 2026-11-20 board meeting, as he requested. Jordan Reyes should put a reminder on 2026-11-20 and send the drafted email only after that date, or after the board decision is known. Then confirm the decision outcome, timeline and the technical buyer's (Aisha Bello) role, and update the opportunity's stage and close date to match.",
+        "follow_up_email": {
+          "to_contact_name": "Marco Lindgren",
+          "subject": "Next steps after the board meeting on Brightwater meter data platform",
+          "body": "Hi Marco, I hope the board meeting went well. Once you have a moment after the decision, could we schedule a 30-minute call to confirm next steps and timing for the meter data platform? Please let me know what works for you. Thank you, Jordan"
+        },
+        "task_due_in_days": 14
+      },
+      "error": null,
+      "latency_ms": 10368,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 1760,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6024
+      },
+      "cost_usd": 0.0009408400000000001,
+      "repeat": 1
+    },
+    {
+      "id": "HO3_no_contact_until_board_meets",
+      "category": "intentional_quiet",
+      "passed": false,
+      "misses": [
+        "decision auto_write not in ['human_review']"
+      ],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "auto_write",
+      "reasons": [],
+      "rule_flags": [
+        "stale"
+      ],
+      "confidence": 0.8,
+      "assessment": {
+        "opportunity_id": "006EVAL00000003",
+        "status": "at_risk",
+        "risk_reasons": [
+          "No completed activity in the last 30 days: the last completed activity was 2026-09-15, 40 days before today (2026-10-25).",
+          "The decision maker, Marco Lindgren, asked for no calls or emails until the board meets on 2026-11-20, which leaves about four weeks before the 2026-12-18 close date with no direct contact.",
+          "The deal is still in Value Proposition at 50% probability and its next step depends entirely on an external board decision that is not yet scheduled to happen before close."
+        ],
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-15"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2026-12-18"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Value Proposition"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Wait for board decision"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-09-15"
+          },
+          {
+            "field": "activities[0].Status",
+            "value": "Completed"
+          },
+          {
+            "field": "activities[0].Description",
+            "value": "Marco: no calls or emails until our board meets on 2026-11-20. The board decides on all new vendor contracts at that meeting."
+          },
+          {
+            "field": "opportunity.OpportunityContactRoles[0].Contact.Name",
+            "value": "Marco Lindgren"
+          }
+        ],
+        "next_step": "Do not contact Marco before the 2026-11-20 board meeting, as he requested. Create an internal task for Jordan Reyes to review the deal and confirm the post-board timeline against the 2026-12-18 close date. Send the drafted follow-up to Marco only after 2026-11-20, and if the board outcome is still unknown then, escalate the close date and forecast category for review.",
+        "follow_up_email": {
+          "to_contact_name": "Marco Lindgren",
+          "subject": "Brightwater meter data platform: next steps after the board meeting",
+          "body": "Hi Marco, I understand the board meets on November 20 to decide on new vendor contracts, and I will hold off on contact until then as you asked. Once the board has decided, could we schedule a short call to confirm the outcome and agree the timeline toward our December 18 target? Aisha Bello is welcome to join if technical questions come up. Best regards, Jordan Reyes"
+        },
+        "task_due_in_days": 14
+      },
+      "error": null,
+      "latency_ms": 10515,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 1820,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6024
+      },
+      "cost_usd": 0.00097084,
+      "repeat": 2
+    },
+    {
+      "id": "HO4_architecture_board_cadence_meeting_booked",
+      "category": "looks_risky_but_healthy",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "no_action",
+      "reasons": [],
+      "rule_flags": [],
+      "confidence": 0.8,
+      "assessment": {
+        "opportunity_id": "006EVAL00000004",
+        "status": "healthy",
+        "risk_reasons": [],
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-29"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-04-30"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Id. Decision Makers"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Architecture board review 2026-11-02"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-11-02"
+          },
+          {
+            "field": "activities[1].Status",
+            "value": "Completed"
+          },
+          {
+            "field": "activities[1].ActivityDate",
+            "value": "2026-09-29"
+          }
+        ],
+        "next_step": "Prepare for the 2026-11-02 architecture board review with the CIO: confirm attendance and agenda with Marco Lindgren (Decision Maker) and Aisha Bello (Technical Buyer), and log the outcome as a completed activity afterward. The last completed activity was 26 days ago, so schedule a touchpoint before the 30-day inactivity threshold is crossed.",
+        "follow_up_email": null,
+        "task_due_in_days": 7
+      },
+      "error": null,
+      "latency_ms": 6401,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 978,
+        "cache_creation_input_tokens": 998,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.00066569,
+      "repeat": 0
+    },
+    {
+      "id": "HO4_architecture_board_cadence_meeting_booked",
+      "category": "looks_risky_but_healthy",
+      "passed": false,
+      "misses": [
+        "decision human_review not in ['no_action']"
+      ],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "human_review",
+      "reasons": [
+        "low confidence 0.70 < 0.8"
+      ],
+      "rule_flags": [],
+      "confidence": 0.7,
+      "assessment": {
+        "opportunity_id": "006EVAL00000004",
+        "status": "healthy",
+        "risk_reasons": [],
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-29"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-04-30"
+          },
+          {
+            "field": "opportunity.StageName",
+            "value": "Id. Decision Makers"
+          },
+          {
+            "field": "activities[1].Status",
+            "value": "Completed"
+          },
+          {
+            "field": "activities[1].ActivityDate",
+            "value": "2026-09-29"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-11-02"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Architecture board review 2026-11-02"
+          }
+        ],
+        "next_step": "Confirm the 2026-11-02 architecture board review with the CIO and Marco Lindgren, and prepare the presentation. The last completed activity was 2026-09-29, so the 30-day recency window lapses around 2026-10-29 unless a completed activity is logged before then. Log the 09-29 session outcome if it is not already recorded.",
+        "follow_up_email": null,
+        "task_due_in_days": 4
+      },
+      "error": null,
+      "latency_ms": 6341,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 976,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6132
+      },
+      "cost_usd": 0.00054992,
+      "repeat": 1
+    },
+    {
+      "id": "HO4_architecture_board_cadence_meeting_booked",
+      "category": "looks_risky_but_healthy",
+      "passed": false,
+      "misses": [
+        "decision human_review not in ['no_action']"
+      ],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "human_review",
+      "reasons": [
+        "low confidence 0.75 < 0.8"
+      ],
+      "rule_flags": [],
+      "confidence": 0.75,
+      "assessment": {
+        "opportunity_id": "006EVAL00000004",
+        "status": "healthy",
+        "risk_reasons": [],
+        "confidence": 0.75,
+        "evidence": [
+          {
+            "field": "opportunity.LastActivityDate",
+            "value": "2026-09-29"
+          },
+          {
+            "field": "opportunity.CloseDate",
+            "value": "2027-04-30"
+          },
+          {
+            "field": "opportunity.NextStep",
+            "value": "Architecture board review 2026-11-02"
+          },
+          {
+            "field": "activities[1].Status",
+            "value": "Completed"
+          },
+          {
+            "field": "activities[1].ActivityDate",
+            "value": "2026-09-29"
+          },
+          {
+            "field": "activities[0].Subject",
+            "value": "Architecture board review with CIO"
+          },
+          {
+            "field": "activities[0].ActivityDate",
+            "value": "2026-11-02"
+          },
+          {
+            "field": "opportunity.OpportunityContactRoles[0].Contact.Name",
+            "value": "Marco Lindgren"
+          }
+        ],
+        "next_step": "Confirm the 2026-11-02 architecture board review with CIO is on the customer's agenda, prepare the presentation with Aisha Bello (technical buyer) input, and log the outcome. The last completed activity is 26 days old, so the 30-day activity window lapses on 2026-10-29 unless a completed touchpoint is logged before then.",
+        "follow_up_email": null,
+        "task_due_in_days": 4
+      },
+      "error": null,
+      "latency_ms": 6438,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 1092,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6132
+      },
+      "cost_usd": 0.00060792,
+      "repeat": 2
+    }
+  ]
+}

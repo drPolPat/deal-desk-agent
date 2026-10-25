@@ -32,6 +32,12 @@ def validate_output(text: str) -> tuple[DealAssessment | None, str | None]:
 # --- 2. Deterministic deal rules (independent of the model) -------------------------------
 
 
+def amount_known(opportunity: dict[str, Any]) -> bool:
+    """A null, zero or negative amount is a data error, and it would slip under the auto-write cap."""
+    amount = opportunity.get("Amount")
+    return amount is not None and amount > 0
+
+
 def rule_flags(opportunity: dict[str, Any], today: date, stale_days: int) -> list[str]:
     """Facts computed in code from Salesforce fields. Used to cross-check the model."""
     flags = []
@@ -44,7 +50,7 @@ def rule_flags(opportunity: dict[str, Any], today: date, stale_days: int) -> lis
         flags.append("past_close_date")
     if not opportunity.get("OpportunityContactRoles"):
         flags.append("no_contacts")
-    if opportunity.get("Amount") is None:
+    if not amount_known(opportunity):
         flags.append("missing_amount")
     return flags
 
@@ -177,11 +183,13 @@ def route(
         reasons.append("possible prompt injection in Salesforce text fields")
     if assessment.status == "healthy" and RISK_FLAGS & set(flags):
         reasons.append(f"model says healthy but rules flag {sorted(RISK_FLAGS & set(flags))}")
+    if assessment.contact_restricted:  # a person decides how and when to re-engage
+        reasons.append("customer contact restricted: " + "; ".join(assessment.risk_reasons)[:300])
 
     if assessment.status == "at_risk":
         amount = opportunity.get("Amount")
-        if amount is None:
-            reasons.append("amount unknown, cannot apply the auto-write limit")
+        if not amount_known(opportunity):
+            reasons.append(f"amount unknown ({amount}), cannot apply the auto-write limit")
         elif amount >= auto_write_max_amount:
             reasons.append(f"high value {amount:,.0f} >= {auto_write_max_amount:,.0f}")
         if assessment.follow_up_email and not assessment.follow_up_email.to_contact_name:

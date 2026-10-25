@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr = SecretStr("")
     model: str = "claude-sonnet-5-5"
     effort: str = "medium"  # output_config.effort: low | medium | high
-    prompt_version: str = "v1"
+    prompt_version: str = "v2"  # v1 kept for comparison (evals/results/*/v1)
     llm_timeout_seconds: float = 90.0
     llm_max_retries: int = 3  # SDK retries 429/5xx/connection errors with backoff
     max_agent_turns: int = 6
