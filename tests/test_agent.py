@@ -42,14 +42,14 @@ class FakeSF:
         self.calls = []
         self.tasks = []
 
-    def search_opportunities(self, limit=50):
+    def search_opportunities(self, stage=None, min_amount=None, limit=50):
         return [{"Id": o["Id"], "Name": o["Name"]} for o in self.opps]
 
     def get_opportunity_details(self, opp_id):
         self.calls.append(("details", opp_id))
         return next(o for o in self.opps if o["Id"] == opp_id)
 
-    def get_activity_history(self, opp_id):
+    def get_activity_history(self, opp_id, limit=20):
         self.calls.append(("activities", opp_id))
         return ACTIVITIES
 

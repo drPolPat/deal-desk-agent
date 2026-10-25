@@ -118,7 +118,7 @@ so a reviewer can read every rule in one place.
 | 8 | **Idempotency.** Before calling the model, the runner checks for an open Task with the `[Deal Desk Agent]` prefix and skips the deal if one exists. | Re-runs must not stack duplicate follow-ups. Checking first also makes re-runs free for actioned deals. Verified live: the second `--write` run created 0 Tasks. |
 | 9 | **Least privilege, three layers.** Salesforce: the integration user reads Account/Contact/Opportunity and creates Tasks. Code: `SalesforceClient` has no update or delete method, and a test fails if one is added. Agent: no write tools. | One layer can be misconfigured; three independent layers make that survivable (see the Salesforce lessons below for why the code layer matters). |
 | 10 | **Dry run by default.** Routing and audit run, but nothing is written until `--write` (CLI) or `DRY_RUN=false` (service). | New prompts and models can be trialled against the real org with zero risk. |
-| 11 | **Audit trail.** One BigQuery row per decision: input record IDs, model, prompt version, effort, tokens, cost, latency, decision, reasons, rule flags, the full assessment, Task ID, and who approved. Reviews go to their own append-only table. If a BigQuery write fails, the full row goes to Cloud Logging and the run continues. | "Why did the agent write this?" must be answerable months later, and an audit record must never be silently lost. |
+| 11 | **Audit trail.** One BigQuery row per decision: input record IDs, model, prompt version, effort, tokens, cost, latency, decision, reasons, rule flags, the full assessment, Task ID, and who approved. Reviews and writes made through MCP go to their own append-only tables. If a BigQuery write fails, the full row goes to Cloud Logging and the run continues. | "Why did the agent write this?" must be answerable months later, and an audit record must never be silently lost. |
 | 12 | **Reliability.** Timeouts on every call; exponential backoff with jitter on Salesforce network/5xx errors; the Anthropic SDK's own retries on 429/5xx. A clean stop on `REQUEST_LIMIT_EXCEEDED`, and before this app uses 80% of the org's daily API allowance. `create_task` is never retried. | Other integrations share the org's API limit. Retrying a write after a timeout can duplicate it, so a failed write goes back to a human instead. |
 | 13 | **Cost and latency.** Prompt caching on the shared system prompt and tools; a per-run summary with tokens, cost and p50/p95 latency. | The first full run cost $0.41. A cache breakpoint on the shared prefix, plus the corrected Sonnet 5.5 cache-hit price ($0.10/MTok), brought it to about $0.23. |
 | 14 | **Access control on the service.** Every endpoint except `/health` needs a bearer token from Secret Manager, and the service refuses everything if no token is configured. | Fail closed. Reviewer identity is a configured name for now; IAP is the production answer (see next steps). |
@@ -185,7 +185,7 @@ uv run deal-desk sf-check                  # auth + every read tool as the integ
 uv run deal-desk run                       # dry run: routes and audits, writes nothing
 uv run deal-desk run --write               # creates Tasks for auto_write decisions
 uv run python evals/run_evals.py           # eval suite; add --model claude-haiku-5-5 to compare
-uv run pytest                              # 59 unit tests, no network
+uv run pytest                              # 65 unit tests, no network
 ```
 
 Locally the audit log and review queue are JSONL files in `audit_local/`. With `GCP_PROJECT` and
@@ -200,6 +200,13 @@ Locally the audit log and review queue are JSONL files in `audit_local/`. With `
 | `GET /reviews` | pending items: latest decision per deal that needs a human |
 | `POST /reviews/{run_id}/{opportunity_id}/approve` | writes the drafted Task, or your edited `subject` and `description` |
 | `POST /reviews/{run_id}/{opportunity_id}/reject` | records the rejection with an optional note |
+
+**From Claude Desktop or Claude Code (MCP):** `deal-desk-mcp` is a stdio MCP server, built on the
+official Python `mcp` SDK, exposing `search_opportunities`, `get_opportunity_details`,
+`get_activity_history` and `create_task`. The reads are annotated read-only. `create_task` keeps the
+agent's guardrails: no edit or delete path, a refusal when an open agent Task already exists,
+`DRY_RUN` honoured, and every call audited in `tool_writes`. The repo ships a project-scoped
+`.mcp.json` for Claude Code; setup for both clients is in [docs/mcp.md](docs/mcp.md).
 
 **Deploy to your own GCP project:** run [`scripts/gcp_setup.sh`](scripts/gcp_setup.sh) once in Cloud
 Shell. It enables the APIs, creates the budget alert, Artifact Registry with a cleanup policy, the
@@ -253,8 +260,7 @@ External Client App; and the current Salesforce CLI redacts the token in `sf org
   evidence rather than a default.
 - **More data sources.** Gainsight health scores and HubSpot engagement data as extra read tools, so
   "at risk" can include product usage and marketing signals, not just CRM activity.
-- **An MCP server** exposing the same tools to Claude Desktop and Claude Code, and a TypeScript
-  review UI (milestones 5 and 6 of this project).
+- **A TypeScript review UI** for the approval queue (milestone 6 of this project).
 - **Operations:** a Cloud Scheduler trigger for a daily run, alerting on `audit write failed` and on
   runs that stop early, and a before-delete Apex trigger on Task (see the Salesforce lessons above).
 
@@ -270,6 +276,7 @@ src/deal_desk/
   schemas.py      the model's output contract (Pydantic)
   prompts/v1.md   system prompt, versioned and recorded on every audit row
   api.py          FastAPI service for Cloud Run
+  mcp_server.py   the same tools over MCP for Claude Desktop / Claude Code
   audit.py        JSONL locally, BigQuery on Cloud Run
 evals/            scenarios, runner, per-model results
 scripts/          Salesforce seed data, one-time GCP setup

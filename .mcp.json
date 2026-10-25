@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "deal-desk": {
+      "command": "uv",
+      "args": ["run", "deal-desk-mcp"]
+    }
+  }
+}

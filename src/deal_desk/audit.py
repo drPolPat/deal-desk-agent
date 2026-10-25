@@ -49,8 +49,12 @@ COLUMNS: dict[str, dict[str, str]] = {
              "cost_usd": "FLOAT", "stopped_early": "STRING"},
     "reviews": {"review_id": "STRING", "run_id": "STRING", "opportunity_id": "STRING",
                 "action": "STRING", "reviewer": "STRING", "task_id": "STRING"},
+    # Writes made through the MCP server's create_task tool (outside agent runs).
+    "tool_writes": {"write_id": "STRING", "source": "STRING", "opportunity_id": "STRING",
+                    "task_id": "STRING", "dry_run": "BOOLEAN"},
 }
-ROW_KEY = {"decisions": ("run_id", "opportunity_id"), "runs": ("run_id",), "reviews": ("review_id",)}
+ROW_KEY = {"decisions": ("run_id", "opportunity_id"), "runs": ("run_id",), "reviews": ("review_id",),
+           "tool_writes": ("write_id",)}
 
 
 class BigQueryAuditStore:
