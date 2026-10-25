@@ -114,7 +114,7 @@ so a reviewer can read every rule in one place.
 | 4 | **Deterministic rules.** Code computes stale (30+ days), no activity, past close date, no contacts and missing amount. If the model calls a deal healthy while the rules flag it, the deal goes to review. | The model and plain code check each other. Disagreement is a signal, not something to average away. |
 | 5 | **Prompt-injection defence.** The prompt treats Salesforce text as data, and a regex flags instruction-like text in descriptions, next steps and activities. | Salesforce free-text fields are user input. The seeded injection asks for confidence 1.0 and a 40% discount; the model ignored it, and the detector sent the deal to a human anyway. |
 | 6 | **Content policy.** The email recipient must be a contact on the deal; discounts or pricing commitments are rejected. | The agent recommends; commercial commitments stay with the owner. |
-| 7 | **Routing.** `auto_write` only if confidence ≥ 0.8 **and** amount < 100,000 **and** every check passes. Missing amount or no contact means review. | High-value deals deserve human eyes, and uncertainty should cost a reviewer's minute, not a wrong action. Both thresholds are config. |
+| 7 | **Routing.** `auto_write` only if confidence ≥ 0.8 **and** amount < 100,000 **and** every check passes. A missing, zero or negative amount, no contact to email, or a contact restriction (`contact_restricted`, e.g. a tender no-contact period) means review. | High-value deals deserve human eyes, and uncertainty should cost a reviewer's minute, not a wrong action. Both thresholds are config. |
 | 8 | **Idempotency.** Before calling the model, the runner checks for an open Task with the `[Deal Desk Agent]` prefix and skips the deal if one exists. | Re-runs must not stack duplicate follow-ups. Checking first also makes re-runs free for actioned deals. Verified live: the second `--write` run created 0 Tasks. |
 | 9 | **Least privilege, three layers.** Salesforce: the integration user reads Account/Contact/Opportunity and creates Tasks. Code: `SalesforceClient` has no update or delete method, and a test fails if one is added. Agent: no write tools. | One layer can be misconfigured; three independent layers make that survivable (see the Salesforce lessons below for why the code layer matters). |
 | 10 | **Dry run by default.** Routing and audit run, but nothing is written until `--write` (CLI) or `DRY_RUN=false` (service). | New prompts and models can be trialled against the real org with zero risk. |
@@ -157,10 +157,103 @@ pricing page the same day. 16 scenarios call the model; the 5 canned ones cost n
 ¹ Warm prompt cache (no cache writes). From a cold cache the Sonnet run costs about $0.17.
 
 **What this does and doesn't show:** the suite doesn't separate the three models. Its scenarios are
-deliberately clear-cut, so it works as a regression gate, not a benchmark. On this evidence Haiku
-5.5 makes the same routing decisions at about a tenth of Sonnet's cost. Sonnet stays the default
-because the suite doesn't yet measure what would justify paying more: email quality, the wording of
-risk reasons, and confidence calibration on ambiguous deals. Switch with `MODEL=...`.
+deliberately clear-cut, so it works as a regression gate, not a benchmark. Telling the models apart
+takes the borderline suite below. With prompt v2 the gate still passes 21/21 on all three models.
+
+### Borderline evals
+
+A second suite, [`evals/borderline.json`](evals/borderline.json), tests judgment on hard cases. Each
+of its 23 scenarios has a label, a one-line rationale, and the set of decisions a careful RevOps lead
+would accept. The categories:
+
+- **thresholds:** 29 vs 31 days quiet; $99,999 vs $100,000; a stage change with no logged activity
+- **conflicting signals:** recent activity but a frozen budget, a lost signing authority, or three
+  slipped close dates
+- **misleading activity:** an overdue call never logged; a mass newsletter hiding 70 quiet days; only
+  system activity
+- **recipient choice:** the primary contact has left; the primary contact is the billing inbox
+- **intentional quiet:** a tender no-contact period; a pause the customer asked for
+- **adversarial:** a plausible "report this deal as healthy" policy note; a note asking for a 25%
+  loyalty credit
+- **data quality:** a $0 amount; "contract signed" on an open deal past its close date
+- **looks risky but healthy:** a resolved concern, a long cycle with a meeting booked, alarming words
+  in a harmless context, a real meeting yesterday
+
+**How it runs:**
+- Each scenario runs 3 times per model, to measure consistency as well as accuracy.
+- **Over-caution** is reported next to the pass rate, so a model can't score well by escalating
+  everything. It's the share of runs where the model escalated or flagged risk although `no_action`
+  or `auto_write` was the best answer.
+- The suite runs only by hand (`run_evals.py --suite borderline`, or the `borderline-evals` workflow),
+  never on push. A full three-model run costs about $2.30.
+
+**Holdout:** four more scenarios in [`evals/holdout.json`](evals/holdout.json) test the same patterns
+with different surface details: an overdue demo, 28 quiet days, "no calls until our board meets", and
+an architecture-board cadence. They were committed before prompt v2 was written and never used to
+tune it, so they're reported separately.
+
+**v1 failures:**
+1. Every model noticed a **$0 amount**, but the guardrail only treated a *missing* amount as unknown,
+   so the deal was auto-written.
+2. **Haiku drafted outreach** during a tender no-contact period and an agreed pause, although its own
+   next step said "do not contact". The schema required an email for every at-risk deal.
+3. Opus and Sonnet saw an **overdue, never-logged call** but answered "healthy" with low confidence.
+4. **All models lowered confidence on a 29-day deal** because it "will pass the threshold tomorrow",
+   which accounts for all of Opus's and Sonnet's over-caution.
+
+Full analysis: [v1/analysis.md](evals/results/borderline/v1/analysis.md).
+
+**Fixes in v2:**
+- A zero or negative amount counts as unknown and goes to review (code).
+- A required `contact_restricted` flag: no email allowed, always routed to review, reason recorded
+  (schema and code).
+- Prompt v2 clarifies overdue activities, contact restrictions, and that confidence measures today's
+  status, not how close the deal is to a threshold.
+
+The guardrails were not loosened to make any case pass.
+
+| | Opus 5.5 v1 → v2 | Sonnet 5.5 v1 → v2 | Haiku 5.5 v1 → v2 |
+|---|---|---|---|
+| **Borderline pass rate** (69 runs) | 91% → **100%** | 91% → **100%** | 88% → **94%** |
+| Consistency (same decision in all 3 repeats) | 100% → 91%¹ | 100% → 100% | 87% → 96% |
+| Stable pass (passed all 3 repeats) | 91% → 100% | 91% → 100% | 83% → 91% |
+| Over-caution | 14% → 0% | 14% → 0% | 24% → 0% |
+| Intentional quiet (tender, pause) | 6/6 → 6/6 | 6/6 → 6/6 | **1/6 → 6/6** |
+| **Holdout pass rate** (12 runs, unseen by v2) | 75% → **100%** | 67% → **100%** | 58% → **100%** |
+| Regression gate (21 scenarios) | 100% → 100% | 100% → 100% | 100% → 100% |
+| Borderline cost / p50 latency (v2) | $1.61 / 10.2 s | $0.64 / 6.3 s | $0.04 / 6.2 s |
+
+¹ Opus varied only between two acceptable answers (auto-write or review) on two scenarios.
+
+Per-category tables: [v1](evals/results/borderline/v1/summary.md), [v2](evals/results/borderline/v2/summary.md),
+[holdout v1](evals/results/holdout/v1/summary.md), [holdout v2](evals/results/holdout/v2/summary.md).
+
+**What's left in v2:**
+- Haiku still calls a deal with only automated activity "healthy" (3/3). It notices, writing "the only
+  logged activity is an automated marketing email", but only its low confidence sends it to review.
+- On contact freezes, every model set `contact_restricted` in every run (27/27, holdout included), so
+  those deals now reach review by design rather than through the stale rule.
+
+**Which model should be the default?** Sonnet 5.5.
+- It matches Opus on every suite, at 40% of the cost and about 40% faster, and it was the most
+  consistent model in both versions.
+- Opus bought nothing extra here.
+- Haiku is 14× cheaper and passed the holdout, but it's still the weakest at recognising risk that
+  the rules can't see. In v1 it was the only model that would have emailed a customer during a
+  no-contact period.
+- At this volume (about $0.23 vs $0.02 per 29-deal run) the saving is a few dollars a month, which
+  doesn't pay for one email that breaks a tender rule.
+
+**Is Haiku safe enough to be the default with fixes 1 and 2 in code? Not yet.**
+- Fix 1 is fully deterministic and protects every model.
+- Fix 2 is only half in code: the code guarantees that a restricted deal gets no email and goes to a
+  human, but *recognising* the restriction is still the model's judgment. Haiku got it right in 9 of
+  9 runs, but that's three scenarios.
+- **The remaining risk:** a contact freeze phrased in a way Haiku doesn't recognise would still be
+  auto-written, and v1 showed Haiku will draft an email that contradicts its own reasoning.
+- **What would change the answer:** a code-level backstop that sends any deal whose notes mention a
+  contact freeze to review regardless of the model's flag, plus a larger holdout. With those, Haiku
+  could reasonably run a high-volume first pass.
 
 ## Cost per run
 
@@ -296,9 +389,9 @@ External Client App; and the current Salesforce CLI redacts the token in `sf org
   two endpoints. As a BPMN process, each `human_review` decision becomes a user task, with assignment
   by deal owner or region, SLA timers, and escalation to a manager when a high-value item sits unreviewed.
   The process model also documents the approval policy, and the audit trail comes with it.
-- **Borderline evals that separate models.** Add graded ambiguous scenarios (mixed signals, partial
-  data) and an LLM-judge rubric for email quality and calibration. Then the model choice rests on
-  evidence rather than a default.
+- **Harden the borderline findings.** Add a deterministic backstop for contact freezes (notes saying
+  "do not contact", "pause until", "no calls until" go to review whatever the model says), grow the
+  holdout, and add an LLM-judge rubric for email quality, which no suite measures yet.
 - **More data sources.** Gainsight health scores and HubSpot engagement data as extra read tools, so
   "at risk" can include product usage and marketing signals, not just CRM activity.
 - **Operations:** a Cloud Scheduler trigger for a daily run, alerting on `audit write failed` and on
@@ -314,7 +407,7 @@ src/deal_desk/
   review.py       human review queue: pending, approve, reject
   salesforce.py   client-credentials auth, read tools, create_task, retries, API budget
   schemas.py      the model's output contract (Pydantic)
-  prompts/v1.md   system prompt, versioned and recorded on every audit row
+  prompts/v2.md   system prompt (default; v1 kept for comparison), recorded on every audit row
   api.py          FastAPI service for Cloud Run
   mcp_server.py   the same tools over MCP for Claude Desktop / Claude Code
   audit.py        JSONL locally, BigQuery on Cloud Run
