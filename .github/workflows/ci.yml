@@ -97,5 +97,6 @@ jobs:
       - name: Smoke test
         run: |
           URL=$(gcloud run services describe deal-desk-agent --region "${{ vars.GCP_REGION }}" --format='value(status.url)')
-          curl -fsS "$URL/health"
+          # Traffic can take a few seconds to reach the new revision after deploy returns.
+          for i in $(seq 1 12); do curl -fsS "$URL/health" && break; [ "$i" = 12 ] && exit 1; sleep 5; done
           test "$(curl -s -o /dev/null -w '%{http_code}' "$URL/reviews")" = 401
