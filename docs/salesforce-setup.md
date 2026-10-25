@@ -16,7 +16,9 @@ locked-down integration user. (JWT bearer would be the choice if the app had to 
    the **Minimum Access - Salesforce** profile.
 5. **Permission set** "Deal Desk Agent" (License matching the user's):
    - Object Settings: Accounts, Contacts, Opportunities → **Read** + **View All**. No Edit, no Delete.
-   - System Permissions: **API Enabled**, **Edit Tasks**.
+   - System Permissions: **Access Activities** and **Edit Tasks**. Without Access Activities, Task and Event
+     don't exist at all for this user (`INVALID_TYPE: sObject type 'Task' is not supported`), even with
+     Edit Tasks granted. API Enabled comes from the profile.
    - Manage Assignments → add the integration user.
 6. **External Client App**: Setup → Quick Find "External Client App Manager" → New External Client App.
    - Distribution State **Local**; Enable OAuth; Callback URL `https://login.salesforce.com/services/oauth2/success`

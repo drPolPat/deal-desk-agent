@@ -184,16 +184,17 @@ def admin_connection(alias: str) -> Salesforce:
     sf_cli = shutil.which("sf")
     if not sf_cli:
         sys.exit("Salesforce CLI not found. Install it: npm install -g @salesforce/cli")
-    out = subprocess.run(  # noqa: S603
-        [sf_cli, "org", "display", "--target-org", alias, "--json"],
-        capture_output=True, text=True, check=False,
-    )
-    if out.returncode != 0:
-        sys.exit(f"`sf org display` failed. Log in first: sf org login web --alias {alias}\n"
-                 f"{out.stdout or out.stderr}")
-    result = json.loads(out.stdout)["result"]
-    return Salesforce(instance_url=result["instanceUrl"], session_id=result["accessToken"],
-                      version=API_VERSION)
+    def sf_json(*cmd: str) -> dict[str, Any]:
+        out = subprocess.run([sf_cli, *cmd, "--target-org", alias, "--json"],  # noqa: S603
+                             capture_output=True, text=True, check=False)
+        if out.returncode != 0:
+            sys.exit(f"`sf {' '.join(cmd)}` failed. Log in first: sf org login web --alias {alias}")
+        return json.loads(out.stdout)["result"]
+
+    # Recent sf CLI versions redact the token in `org display`; it has its own command now.
+    instance_url = sf_json("org", "display")["instanceUrl"]
+    token = sf_json("org", "auth", "show-access-token")["accessToken"]
+    return Salesforce(instance_url=instance_url, session_id=token, version=API_VERSION)
 
 
 def insert_many(sf: Salesforce, sobject: str, records: list[dict[str, Any]]) -> list[str]:
