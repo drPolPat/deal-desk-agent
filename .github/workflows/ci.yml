@@ -2,6 +2,7 @@ name: ci
 
 on:
   push:
+    paths-ignore: ["**.md", "docs/**"]  # docs-only changes don't need evals or a redeploy
   pull_request:
 
 permissions:

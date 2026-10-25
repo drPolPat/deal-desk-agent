@@ -66,7 +66,7 @@ Hi Ibrahim, It has been a while since our discovery call in July ... Do you have
 ## Architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph GH[GitHub Actions]
         CI[lint + unit tests] --> EV[eval gate<br/>21 scenarios] --> IMG[container build<br/>+ health check] --> DEP[deploy<br/>Workload Identity, no keys]
     end
