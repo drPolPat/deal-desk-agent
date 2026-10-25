@@ -130,7 +130,15 @@ def test_create_task_is_never_retried():
 def test_client_has_no_update_or_delete_methods():
     public = {m for m in dir(SalesforceClient) if not m.startswith("_")}
     assert public == {"from_settings", "api_usage", "search_opportunities",
-                      "get_opportunity_details", "get_activity_history", "create_task"}
+                      "get_opportunity_details", "get_activity_history", "has_open_agent_task",
+                      "create_task"}
+
+
+def test_open_task_check_matches_only_open_agent_tasks():
+    fake = FakeSF()
+    assert client(fake).has_open_agent_task(OPP_ID) is False
+    assert (f"WhatId = '{OPP_ID}' AND IsClosed = false "
+            "AND Subject LIKE '[Deal Desk Agent] %' LIMIT 1") in fake.soql[0]
 
 
 def test_clean_flattens_child_relationships():

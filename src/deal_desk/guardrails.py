@@ -137,7 +137,8 @@ def policy_failures(assessment: DealAssessment, opportunity: dict[str, Any]) -> 
 
 # --- 5. Routing ---------------------------------------------------------------------------
 
-Action = Literal["auto_write", "human_review", "no_action"]
+# already_actioned is set by the runner, not route(): it needs a live Salesforce lookup.
+Action = Literal["auto_write", "human_review", "no_action", "already_actioned"]
 
 
 @dataclass

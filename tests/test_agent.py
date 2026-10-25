@@ -53,6 +53,9 @@ class FakeSF:
         self.calls.append(("activities", opp_id))
         return ACTIVITIES
 
+    def has_open_agent_task(self, opp_id):
+        return any(t[0] == opp_id for t in self.tasks)
+
     def create_task(self, opp_id, **fields):
         self.tasks.append((opp_id, fields))
         return "00TNEW"
@@ -127,3 +130,14 @@ def test_live_run_writes_one_task_and_audits_it(tmp_path):
     assert "Draft email to Ibrahim Yusuf" in fields["description"]
     row = json.loads((tmp_path / "decisions.jsonl").read_text())
     assert row["task_id"] == "00TNEW" and row["approved_by"] == "guardrails"
+
+
+def test_rerun_does_not_duplicate_tasks(tmp_path):
+    sf = FakeSF()
+    live = SETTINGS.model_copy(update={"dry_run": False})
+    run(live, sf, good_run_llm(), JsonlAuditStore(tmp_path), today=TODAY)
+    summary = run(live, sf, good_run_llm(), JsonlAuditStore(tmp_path), today=TODAY)
+    assert len(sf.tasks) == 1
+    assert summary["already_actioned"] == 1 and summary["auto_write"] == 0
+    second = json.loads((tmp_path / "decisions.jsonl").read_text().splitlines()[1])
+    assert second["decision"] == "already_actioned" and second["task_id"] is None

@@ -219,6 +219,17 @@ class SalesforceClient:
         activities.sort(key=lambda a: a.get("ActivityDate") or "", reverse=True)
         return activities[:limit]
 
+    def has_open_agent_task(self, opportunity_id: str) -> bool:
+        """True if this app already left an open Task on the opportunity (idempotency check)."""
+        _check_opportunity_id(opportunity_id)
+        soql = format_soql(
+            "SELECT Id FROM Task WHERE WhatId = {} AND IsClosed = false "
+            "AND Subject LIKE '{:like}%' LIMIT 1",
+            opportunity_id,
+            TASK_SUBJECT_PREFIX,
+        )
+        return bool(self._query(soql))
+
     # -- the only write ---------------------------------------------------------------------
 
     def create_task(

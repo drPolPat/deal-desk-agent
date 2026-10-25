@@ -69,7 +69,7 @@ def audit_row(run_id: str, result: AgentResult, decision: Decision, settings: Se
 def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     latencies = sorted(r["latency_ms"] for r in rows)
     costs = [r["cost_usd"] for r in rows if r["cost_usd"] is not None]
-    actions = ("auto_write", "human_review", "no_action")
+    actions = ("auto_write", "human_review", "no_action", "already_actioned")
     by_action = {a: sum(r["decision"] == a for r in rows) for a in actions}
     return {
         "opportunities": len(rows),
@@ -99,6 +99,11 @@ def run(settings: Settings, sf: SalesforceClient, llm: anthropic.Anthropic, stor
                 print(f"  skip {opp['Id']}: {type(exc).__name__}")
                 continue
             decision = decide(result, settings, today)
+            # Idempotency: re-runs must not stack duplicate follow-ups on the same deal.
+            # Checked in dry run too, so a dry run predicts exactly what --write would do.
+            if decision.action == "auto_write" and sf.has_open_agent_task(opp["Id"]):
+                decision = Decision("already_actioned", ["open Deal Desk Agent task already exists"],
+                                    decision.flags)
             task_id = None
             if decision.action == "auto_write" and not settings.dry_run:
                 try:
