@@ -1,6 +1,6 @@
 """HTTP service for Cloud Run: trigger runs and work the human review queue.
 
-Every endpoint except /healthz needs `Authorization: Bearer <REVIEW_API_TOKEN>`. With no token
+Every endpoint except /health needs `Authorization: Bearer <REVIEW_API_TOKEN>`. With no token
 configured, those endpoints refuse every request (fail closed).
 """
 
@@ -57,8 +57,8 @@ class RejectBody(BaseModel):
     note: str | None = Field(None, max_length=2000)
 
 
-@app.get("/healthz")
-def healthz(settings: Settings = Depends(get_settings)) -> dict[str, Any]:
+@app.get("/health")  # not /healthz: Cloud Run reserves paths ending in "z" and never routes them
+def health(settings: Settings = Depends(get_settings)) -> dict[str, Any]:
     return {"ok": True, "model": settings.model, "prompt_version": settings.prompt_version,
             "dry_run": settings.dry_run}
 

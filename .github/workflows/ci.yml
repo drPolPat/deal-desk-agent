@@ -57,10 +57,10 @@ jobs:
       - uses: actions/checkout@v7.0.1
       - name: Build container image
         run: docker build -t deal-desk-agent:ci .
-      - name: Container starts and answers /healthz
+      - name: Container starts and answers /health
         run: |
           docker run -d --name app -p 8080:8080 -e PORT=8080 deal-desk-agent:ci
-          for i in $(seq 1 20); do curl -fsS localhost:8080/healthz && exit 0; sleep 1; done
+          for i in $(seq 1 20); do curl -fsS localhost:8080/health && exit 0; sleep 1; done
           docker logs app; exit 1
 
   deploy:
@@ -97,5 +97,5 @@ jobs:
       - name: Smoke test
         run: |
           URL=$(gcloud run services describe deal-desk-agent --region "${{ vars.GCP_REGION }}" --format='value(status.url)')
-          curl -fsS "$URL/healthz"
+          curl -fsS "$URL/health"
           test "$(curl -s -o /dev/null -w '%{http_code}' "$URL/reviews")" = 401

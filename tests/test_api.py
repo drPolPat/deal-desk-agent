@@ -24,9 +24,9 @@ def client(tmp_path):
 AUTH = {"Authorization": f"Bearer {TOKEN}"}
 
 
-def test_healthz_is_open(client):
+def test_health_is_open(client):
     c, _, _ = client
-    assert c.get("/healthz").json()["ok"] is True
+    assert c.get("/health").json()["ok"] is True
 
 
 @pytest.mark.parametrize("headers", [{}, {"Authorization": "Bearer wrong"}, {"Authorization": TOKEN}])
