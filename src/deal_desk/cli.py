@@ -2,10 +2,10 @@ import argparse
 import json
 from datetime import date, timedelta
 
-import anthropic
-
-from deal_desk.audit import JsonlAuditStore
+from deal_desk.agent import make_llm
+from deal_desk.audit import make_store
 from deal_desk.config import get_settings
+from deal_desk.logs import setup_logging
 from deal_desk.runner import run
 from deal_desk.salesforce import SalesforceClient
 
@@ -37,14 +37,13 @@ def run_agent(args: argparse.Namespace) -> None:
     settings = get_settings()
     if args.write:
         settings = settings.model_copy(update={"dry_run": False})
-    llm = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value() or None,
-                              timeout=settings.llm_timeout_seconds, max_retries=settings.llm_max_retries)
+    llm = make_llm(settings)
     sf = SalesforceClient.from_settings(settings)
     mode = "DRY RUN (no Salesforce writes)" if settings.dry_run else "LIVE (auto_write creates Tasks)"
     print(f"{mode} | model {settings.model} | prompt {settings.prompt_version} | "
           f"auto-write if confidence >= {settings.confidence_threshold} "
           f"and amount < {settings.auto_write_max_amount:,.0f}\n")
-    summary = run(settings, sf, llm, JsonlAuditStore(settings.audit_dir), limit=args.limit)
+    summary = run(settings, sf, llm, make_store(settings), limit=args.limit)
     print("\n" + json.dumps(summary, indent=2))
 
 
@@ -62,6 +61,7 @@ def main() -> None:
                        help="actually create Tasks for auto_write decisions (overrides DRY_RUN)")
     agent.set_defaults(func=run_agent)
     args = parser.parse_args()
+    setup_logging()
     args.func(args)
 
 

@@ -34,6 +34,13 @@ class Settings(BaseSettings):
 
     dry_run: bool = True  # route and audit, but never write to Salesforce
     audit_dir: str = "audit_local"
+    # Set both to use BigQuery for the audit log and review queue (Cloud Run); else JSONL in audit_dir.
+    gcp_project: str = ""
+    bq_dataset: str = ""
+
+    # Review API: bearer token (Secret Manager on Cloud Run) and the name recorded as approver.
+    review_api_token: SecretStr = SecretStr("")
+    reviewer_name: str = "reviewer"
 
 
 @lru_cache

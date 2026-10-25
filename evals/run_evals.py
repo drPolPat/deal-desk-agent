@@ -22,9 +22,7 @@ from pathlib import Path
 from types import SimpleNamespace as NS
 from typing import Any
 
-import anthropic
-
-from deal_desk.agent import assess
+from deal_desk.agent import assess, make_llm
 from deal_desk.config import get_settings
 from deal_desk.costs import cost_usd
 from deal_desk.runner import decide
@@ -124,8 +122,7 @@ def main() -> None:
     settings = get_settings()
     overrides = {k: v for k, v in {"model": args.model, "effort": args.effort}.items() if v}
     settings = settings.model_copy(update=overrides)
-    llm = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value() or None,
-                              timeout=settings.llm_timeout_seconds, max_retries=settings.llm_max_retries)
+    llm = make_llm(settings)
     data = json.loads((HERE / "scenarios.json").read_text(encoding="utf-8"))
     scenarios = list(enumerate(data["scenarios"], 1))
     if args.only:

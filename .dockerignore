@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+.env
+.env.*
+audit_local
+evals
+tests
+docs
+scripts
+ui
+**/__pycache__
+.pytest_cache
+.ruff_cache

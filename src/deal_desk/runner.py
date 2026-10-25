@@ -1,5 +1,6 @@
 """One run: search open deals -> assess each -> route -> write (or queue) -> audit."""
 
+import logging
 import statistics
 import uuid
 from datetime import UTC, date, datetime, timedelta
@@ -15,6 +16,10 @@ from deal_desk.costs import cost_usd
 from deal_desk.guardrails import Decision, route
 from deal_desk.salesforce import ApiLimitExceeded, SalesforceClient, SalesforceUnavailable
 from deal_desk.schemas import DealAssessment
+
+log = logging.getLogger(__name__)
+LOG_FIELDS = ("run_id", "opportunity_id", "decision", "status", "confidence", "reasons", "cost_usd",
+              "latency_ms", "task_id", "dry_run")
 
 
 def task_fields(a: DealAssessment, today: date, run_id: str, prompt_version: str) -> dict[str, Any]:
@@ -104,7 +109,9 @@ def run(settings: Settings, sf: SalesforceClient, llm: anthropic.Anthropic, stor
                     result = assess(llm, sf, opp["Id"], settings, today)
                     decision = decide(result, settings, today)
             except SalesforceError as exc:  # e.g. record deleted mid-run: skip it, keep going
-                print(f"  skip {opp['Id']}: {type(exc).__name__}")
+                log.warning(f"  skip {opp['Id']}: {type(exc).__name__}",
+                            extra={"fields": {"event": "skip", "run_id": run_id,
+                                              "opportunity_id": opp["Id"]}})
                 continue
             task_id = None
             if decision.action == "auto_write" and not settings.dry_run:
@@ -116,13 +123,17 @@ def run(settings: Settings, sf: SalesforceClient, llm: anthropic.Anthropic, stor
             row = audit_row(run_id, result, decision, settings, task_id)
             store.append("decisions", row)
             rows.append(row)
-            print(f"  {decision.action:<13} {row['status'] or '-':<8} conf={row['confidence'] or 0:.2f} "
-                  f"{row['latency_ms']:>6}ms  {opp['Name']}"
-                  + (f"\n                {'; '.join(decision.reasons)}" if decision.reasons else ""))
+            log.info(f"  {decision.action:<13} {row['status'] or '-':<8} conf={row['confidence'] or 0:.2f} "
+                     f"{row['latency_ms']:>6}ms  {opp['Name']}"
+                     + (f"\n                {'; '.join(decision.reasons)}" if decision.reasons else ""),
+                     extra={"fields": {"event": "decision", **{k: row[k] for k in LOG_FIELDS}}})
     except (ApiLimitExceeded, SalesforceUnavailable) as exc:
         stopped = f"{type(exc).__name__}: {exc}"  # stop cleanly; everything so far is audited
+        log.error(f"run stopped early: {stopped}",
+                  extra={"fields": {"event": "run_stopped", "run_id": run_id}})
     summary = {"run_id": run_id, "started": started.isoformat(), "model": settings.model,
                "prompt_version": settings.prompt_version, "dry_run": settings.dry_run,
                "stopped_early": stopped, "sf_api_usage": sf.api_usage(), **summarize(rows)}
     store.append("runs", summary)
+    log.info("run finished", extra={"fields": {"event": "run_summary", **summary}})
     return summary

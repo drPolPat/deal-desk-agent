@@ -23,6 +23,12 @@ OUTPUT_SCHEMA = transform_schema(DealAssessment)
 TOOL_NAMES = {t["name"] for t in READ_TOOLS}
 
 
+def make_llm(settings: Settings) -> anthropic.Anthropic:
+    """SDK client with a request timeout; the SDK retries 429/5xx/connection errors with backoff."""
+    return anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value() or None,
+                               timeout=settings.llm_timeout_seconds, max_retries=settings.llm_max_retries)
+
+
 @cache
 def system_prompt(version: str) -> str:
     return (Path(__file__).parent / "prompts" / f"{version}.md").read_text(encoding="utf-8")
