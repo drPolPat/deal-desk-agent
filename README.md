@@ -95,7 +95,7 @@ flowchart TB
     RUN --> BQ
     RQ --> BQ
     CR --> LOG
-    REV[Reviewer] -->|bearer token| API
+    REV[Reviewer] -->|review UI, bearer token| API
 ```
 
 The model never holds a write tool. The only Salesforce write, `create_task`, is called by routing
@@ -185,7 +185,8 @@ uv run deal-desk sf-check                  # auth + every read tool as the integ
 uv run deal-desk run                       # dry run: routes and audits, writes nothing
 uv run deal-desk run --write               # creates Tasks for auto_write decisions
 uv run python evals/run_evals.py           # eval suite; add --model claude-haiku-5-5 to compare
-uv run pytest                              # 65 unit tests, no network
+uv run pytest                              # 66 unit tests, no network
+cd ui && npm ci && npm test && npm run build   # review UI: 3 tests, typecheck, build
 ```
 
 Locally the audit log and review queue are JSONL files in `audit_local/`. With `GCP_PROJECT` and
@@ -200,6 +201,19 @@ Locally the audit log and review queue are JSONL files in `audit_local/`. With `
 | `GET /reviews` | pending items: latest decision per deal that needs a human |
 | `POST /reviews/{run_id}/{opportunity_id}/approve` | writes the drafted Task, or your edited `subject` and `description` |
 | `POST /reviews/{run_id}/{opportunity_id}/reject` | records the rejection with an optional note |
+
+**The review UI** (React 19, Vite and TypeScript, in [`ui/`](ui/)) is served by the same service at
+`/`, so it needs no CORS setup.
+
+- **Sign-in:** the reviewer pastes the bearer token once per tab. It's kept in `sessionStorage` and
+  sent only in the `Authorization` header.
+- **Mode banner:** always visible, saying whether approvals write to Salesforce or not (dry run).
+- **Cards:** one per item, showing why it needs a human, the rule flags, and the agent's proposal:
+  risk reasons, next step, draft email, and the evidence it cited.
+- **Actions:** approve the draft, approve with your own Task text, or reject, each with an optional
+  audit note. Server refusals, such as a duplicate Task, show inline on the card.
+- **Headers:** responses carry a strict Content-Security-Policy (`default-src 'self'`).
+- **Local development:** run `npm run dev` in `ui/` next to `uvicorn deal_desk.api:app`.
 
 **From Claude Desktop or Claude Code (MCP):** `deal-desk-mcp` is a stdio MCP server, built on the
 official Python `mcp` SDK, exposing `search_opportunities`, `get_opportunity_details`,
@@ -260,7 +274,6 @@ External Client App; and the current Salesforce CLI redacts the token in `sf org
   evidence rather than a default.
 - **More data sources.** Gainsight health scores and HubSpot engagement data as extra read tools, so
   "at risk" can include product usage and marketing signals, not just CRM activity.
-- **A TypeScript review UI** for the approval queue (milestone 6 of this project).
 - **Operations:** a Cloud Scheduler trigger for a daily run, alerting on `audit write failed` and on
   runs that stop early, and a before-delete Apex trigger on Task (see the Salesforce lessons above).
 
@@ -278,6 +291,7 @@ src/deal_desk/
   api.py          FastAPI service for Cloud Run
   mcp_server.py   the same tools over MCP for Claude Desktop / Claude Code
   audit.py        JSONL locally, BigQuery on Cloud Run
+ui/               review UI (React + Vite + TypeScript), built into the container
 evals/            scenarios, runner, per-model results
 scripts/          Salesforce seed data, one-time GCP setup
 docs/             Salesforce setup, step by step
