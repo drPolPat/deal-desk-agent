@@ -96,6 +96,13 @@ def test_search_escapes_model_supplied_stage():
     assert "IsClosed = false" in fake.soql[0]
 
 
+def test_activity_history_queries_tasks_and_events_with_clamped_limit():
+    fake = FakeSF()
+    client(fake).get_activity_history(OPP_ID, limit=500)
+    assert [q.split(" FROM ")[1].split()[0] for q in fake.soql] == ["Task", "Event"]
+    assert all(f"WhatId = '{OPP_ID}'" in q and q.endswith("LIMIT 50") for q in fake.soql)
+
+
 def test_rejects_malformed_ids_before_calling_salesforce():
     fake = FakeSF()
     for bad in ["001Hs00001AbCdEIAV", "006' OR Id != '", "", "006short"]:

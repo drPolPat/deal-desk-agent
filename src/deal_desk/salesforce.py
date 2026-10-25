@@ -202,7 +202,7 @@ class SalesforceClient:
         tasks = self._query(
             format_soql(
                 "SELECT Id, Subject, Status, ActivityDate, Type, Description, CreatedDate "
-                "FROM Task WHERE WhatId = {} ORDER BY ActivityDate DESC NULLS LAST LIMIT {:literal}",
+                "FROM Task WHERE WhatId = {} ORDER BY ActivityDate DESC NULLS LAST LIMIT {}",
                 opportunity_id,
                 limit,
             )
@@ -210,7 +210,7 @@ class SalesforceClient:
         events = self._query(
             format_soql(
                 "SELECT Id, Subject, ActivityDate, Type, Description, CreatedDate "
-                "FROM Event WHERE WhatId = {} ORDER BY ActivityDate DESC NULLS LAST LIMIT {:literal}",
+                "FROM Event WHERE WhatId = {} ORDER BY ActivityDate DESC NULLS LAST LIMIT {}",
                 opportunity_id,
                 limit,
             )

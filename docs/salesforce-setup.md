@@ -20,7 +20,16 @@ locked-down integration user. (JWT bearer would be the choice if the app had to 
      don't exist at all for this user (`INVALID_TYPE: sObject type 'Task' is not supported`), even with
      Edit Tasks granted. API Enabled comes from the profile.
    - Manage Assignments → add the integration user.
-6. **External Client App**: Setup → Quick Find "External Client App Manager" → New External Client App.
+   - Tasks and Events don't appear in permission set Object Settings. Their field-level security is set per
+     field in **Object Manager** on the integration user's **profile** (step 6).
+6. **Task/Event field-level security** on the "Minimum Access - API Only Integrations" profile:
+   Setup → Object Manager → Task (and Event) → Fields & Relationships → field → Set Field-Level Security.
+   - Task: **Related To** (`WhatId`), **Due Date** (`ActivityDate`), **Comments** (`Description`) → Visible,
+     editable. **Type** → Visible, read-only.
+   - Event: **Related To**, **Description**, **Type** → Visible, read-only.
+   - Without these, Task queries fail with `No such column 'ActivityDate' on entity 'Task'` and a Task can't
+     be linked to an opportunity.
+7. **External Client App**: Setup → Quick Find "External Client App Manager" → New External Client App.
    - Distribution State **Local**; Enable OAuth; Callback URL `https://login.salesforce.com/services/oauth2/success`
      (required, unused); scope **Manage user data via APIs (api)**; **Enable Client Credentials Flow**.
    - Policies tab → Edit → OAuth Policies → Enable Client Credentials Flow → **Run As** = the integration user.
@@ -36,3 +45,18 @@ uv run deal-desk sf-check --write-test-task <an opportunity id>
 ```
 
 The last command confirms the integration user can create Tasks (the one write the agent is allowed).
+
+## Verified access (2026-10-25)
+
+| As the integration user | Result |
+|---|---|
+| Read Account, Contact, Opportunity, Task, Event | allowed |
+| Create Task on an opportunity | allowed |
+| Update Opportunity | refused (`CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY`) |
+| Create Event | refused (Event not createable) |
+| Delete a Task **it owns** | **allowed** (bundled with Edit Tasks) |
+
+Known limit: Salesforce gives any user with Edit Tasks the right to edit and delete Tasks they own, and there
+is no separate permission to remove it. So Task edits and deletes are blocked in code only: `SalesforceClient`
+has no update or delete method, and a unit test fails if one is added. A production setup could add a
+before-delete Apex trigger on Task that rejects deletes by the integration user.
