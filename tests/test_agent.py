@@ -5,7 +5,7 @@ from types import SimpleNamespace as NS
 from deal_desk.agent import assess
 from deal_desk.audit import JsonlAuditStore
 from deal_desk.config import Settings
-from deal_desk.runner import run
+from deal_desk.runner import run, short_subject
 from tests.test_guardrails import ACTIVITIES, OPP_ID, TODAY, at_risk, opportunity
 
 SETTINGS = Settings(_env_file=None, model="claude-sonnet-5-5")
@@ -130,6 +130,15 @@ def test_live_run_writes_one_task_and_audits_it(tmp_path):
     assert "Draft email to Ibrahim Yusuf" in fields["description"]
     row = json.loads((tmp_path / "decisions.jsonl").read_text())
     assert row["task_id"] == "00TNEW" and row["approved_by"] == "guardrails"
+
+
+def test_task_subject_is_cut_at_a_word_boundary():
+    long = ("Reach out to Grace Okafor (CIO, decision maker) to book an introductory discovery call. "
+            "Log the activity and set a next step with a date.")
+    s = short_subject(long)
+    assert len(s) <= 120 and s.endswith("…")
+    assert long.startswith(s[:-1]) and long[len(s) - 1] == " "  # cut lands on a space, not mid-word
+    assert short_subject("Call Ibrahim  this\nweek") == "Call Ibrahim this week"
 
 
 def test_rerun_does_not_duplicate_tasks(tmp_path):

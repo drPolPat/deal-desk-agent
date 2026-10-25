@@ -22,6 +22,14 @@ LOG_FIELDS = ("run_id", "opportunity_id", "decision", "status", "confidence", "r
               "latency_ms", "task_id", "dry_run")
 
 
+def short_subject(text: str, limit: int = 120) -> str:
+    """Fit the next step into a Task subject without cutting a word in half."""
+    text = " ".join(text.split())
+    if len(text) <= limit:
+        return text
+    return text[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:.-") + "…"
+
+
 def task_fields(a: DealAssessment, today: date, run_id: str, prompt_version: str) -> dict[str, Any]:
     email = a.follow_up_email
     lines = ["Why this deal is at risk:", *[f"- {r}" for r in a.risk_reasons], "",
@@ -29,7 +37,7 @@ def task_fields(a: DealAssessment, today: date, run_id: str, prompt_version: str
     if email:
         lines += ["", f"Draft email to {email.to_contact_name}:", f"Subject: {email.subject}", "", email.body]
     lines += ["", f"(Deal Desk Agent run {run_id}, prompt {prompt_version}, confidence {a.confidence:.2f})"]
-    return {"subject": a.next_step[:120], "description": "\n".join(lines),
+    return {"subject": short_subject(a.next_step), "description": "\n".join(lines),
             "due_date": today + timedelta(days=a.task_due_in_days)}
 
 
