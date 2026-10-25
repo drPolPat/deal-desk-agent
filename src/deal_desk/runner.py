@@ -44,11 +44,11 @@ def audit_row(run_id: str, result: AgentResult, decision: Decision, settings: Se
         "opportunity_name": opp.get("Name"),
         "amount": opp.get("Amount"),
         "input_record_ids": [opp.get("Id"), opp.get("AccountId"), *[x["Id"] for x in result.activities]],
-        "model": result.model,
+        "model": result.model or None,  # None: no model call was made
         "prompt_version": settings.prompt_version,
         "effort": settings.effort,
         "tokens": dict(result.usage),
-        "cost_usd": cost_usd(result.model, result.usage),
+        "cost_usd": cost_usd(result.model, result.usage) if result.model else 0.0,
         "latency_ms": result.latency_ms,
         "tool_calls": result.tool_calls,
         "validation_attempts": result.validation_attempts,
@@ -67,7 +67,7 @@ def audit_row(run_id: str, result: AgentResult, decision: Decision, settings: Se
 
 
 def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    latencies = sorted(r["latency_ms"] for r in rows)
+    latencies = sorted(r["latency_ms"] for r in rows if r["model"])  # skipped deals would skew p50
     costs = [r["cost_usd"] for r in rows if r["cost_usd"] is not None]
     actions = ("auto_write", "human_review", "no_action", "already_actioned")
     by_action = {a: sum(r["decision"] == a for r in rows) for a in actions}
@@ -94,16 +94,18 @@ def run(settings: Settings, sf: SalesforceClient, llm: anthropic.Anthropic, stor
     try:
         for opp in sf.search_opportunities(limit=limit):
             try:
-                result = assess(llm, sf, opp["Id"], settings, today)
+                # Idempotency, checked before the model call so re-runs cost nothing for deals the
+                # agent already actioned. The deal comes back once the owner completes that Task.
+                # Checked in dry run too, so a dry run predicts exactly what --write would do.
+                if sf.has_open_agent_task(opp["Id"]):
+                    result = AgentResult(opp["Id"], None, None, opp, [], model="")
+                    decision = Decision("already_actioned", ["open Deal Desk Agent task already exists"])
+                else:
+                    result = assess(llm, sf, opp["Id"], settings, today)
+                    decision = decide(result, settings, today)
             except SalesforceError as exc:  # e.g. record deleted mid-run: skip it, keep going
                 print(f"  skip {opp['Id']}: {type(exc).__name__}")
                 continue
-            decision = decide(result, settings, today)
-            # Idempotency: re-runs must not stack duplicate follow-ups on the same deal.
-            # Checked in dry run too, so a dry run predicts exactly what --write would do.
-            if decision.action == "auto_write" and sf.has_open_agent_task(opp["Id"]):
-                decision = Decision("already_actioned", ["open Deal Desk Agent task already exists"],
-                                    decision.flags)
             task_id = None
             if decision.action == "auto_write" and not settings.dry_run:
                 try:

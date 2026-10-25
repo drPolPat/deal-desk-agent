@@ -136,8 +136,11 @@ def test_rerun_does_not_duplicate_tasks(tmp_path):
     sf = FakeSF()
     live = SETTINGS.model_copy(update={"dry_run": False})
     run(live, sf, good_run_llm(), JsonlAuditStore(tmp_path), today=TODAY)
-    summary = run(live, sf, good_run_llm(), JsonlAuditStore(tmp_path), today=TODAY)
+    second_llm = good_run_llm()
+    summary = run(live, sf, second_llm, JsonlAuditStore(tmp_path), today=TODAY)
     assert len(sf.tasks) == 1
+    assert second_llm.requests == []  # skipped before the model call: costs nothing
     assert summary["already_actioned"] == 1 and summary["auto_write"] == 0
+    assert summary["cost_usd"] == 0.0
     second = json.loads((tmp_path / "decisions.jsonl").read_text().splitlines()[1])
     assert second["decision"] == "already_actioned" and second["task_id"] is None
