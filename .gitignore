@@ -13,3 +13,4 @@ ui/dist/
 *.pem
 *.key
 service-account*.json
+.claude/

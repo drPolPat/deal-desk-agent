@@ -29,6 +29,14 @@ def test_health_is_open(client):
     assert c.get("/health").json()["ok"] is True
 
 
+def test_security_headers(client):
+    c, _, _ = client
+    r = c.get("/health")
+    assert r.headers["content-security-policy"].startswith("default-src 'self'")
+    assert r.headers["x-content-type-options"] == "nosniff"
+    assert "content-security-policy" not in c.get("/docs").headers  # Swagger UI needs its CDN
+
+
 @pytest.mark.parametrize("headers", [{}, {"Authorization": "Bearer wrong"}, {"Authorization": TOKEN}])
 def test_everything_else_needs_the_token(client, headers):
     c, _, _ = client

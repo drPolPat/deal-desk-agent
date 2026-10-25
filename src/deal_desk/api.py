@@ -4,12 +4,15 @@ Every endpoint except /health needs `Authorization: Bearer <REVIEW_API_TOKEN>`. 
 configured, those endpoints refuse every request (fail closed).
 """
 
+import os
 import secrets
 import threading
 from functools import lru_cache
+from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, Response
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from deal_desk.agent import make_llm
@@ -23,6 +26,18 @@ from deal_desk.salesforce import SalesforceClient
 setup_logging()
 app = FastAPI(title="Deal Desk Agent", version="0.1.0")
 _run_lock = threading.Lock()  # one run at a time (the service runs with max-instances=1)
+UI_DIR = Path(os.environ.get("UI_DIR") or Path(__file__).resolve().parents[2] / "ui" / "dist")
+CSP = "default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next: Any) -> Response:
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    if not request.url.path.startswith(("/docs", "/redoc")):  # Swagger UI loads from a CDN
+        response.headers.setdefault("Content-Security-Policy", CSP)
+    return response
 
 
 @lru_cache
@@ -100,3 +115,8 @@ def reject_item(run_id: str, opportunity_id: str, body: RejectBody,
         return reject(store, settings, run_id, opportunity_id, note=body.note)
     except ReviewError as exc:
         raise HTTPException(exc.status, str(exc)) from exc
+
+
+# The review UI (ui/, built by Vite). Mounted last so every API route above takes precedence.
+if UI_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=UI_DIR, html=True), name="ui")
