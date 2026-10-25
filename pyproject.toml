@@ -1,0 +1,35 @@
+[project]
+name = "deal-desk-agent"
+version = "0.1.0"
+description = "AI agent that reviews open Salesforce opportunities with explicit guardrails and human review."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "requests>=2.32",
+    "simple-salesforce>=1.12.6",
+]
+
+[project.scripts]
+deal-desk = "deal_desk.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "ruff>=0.7"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deal_desk"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S"]
+ignore = ["S101"]  # asserts are fine in tests
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
