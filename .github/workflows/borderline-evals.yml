@@ -1,0 +1,41 @@
+name: borderline-evals
+
+# Manual only: the borderline suite measures judgment and costs a few dollars per full run, so it
+# never runs on push and never gates a build. The 21-scenario regression suite in ci.yml is the gate.
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: Comma-separated models
+        default: claude-opus-5-5,claude-sonnet-5-5,claude-haiku-5-5
+      repeats:
+        description: Runs per scenario per model
+        default: "3"
+      budget_usd:
+        description: Stop starting new calls after this much spend
+        default: "3.50"
+
+permissions:
+  contents: read
+
+jobs:
+  borderline:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.2.0
+      - run: uv sync --locked --python 3.12
+      - name: Borderline suite
+        run: >
+          uv run python evals/run_evals.py --suite borderline
+          --models "${{ inputs.models }}" --repeats "${{ inputs.repeats }}" --budget-usd "${{ inputs.budget_usd }}"
+      - name: Summary
+        if: always()
+        run: cat evals/results/borderline/*/summary.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: borderline-results
+          path: evals/results/borderline/
