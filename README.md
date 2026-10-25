@@ -215,12 +215,39 @@ Locally the audit log and review queue are JSONL files in `audit_local/`. With `
 - **Headers:** responses carry a strict Content-Security-Policy (`default-src 'self'`).
 - **Local development:** run `npm run dev` in `ui/` next to `uvicorn deal_desk.api:app`.
 
-**From Claude Desktop or Claude Code (MCP):** `deal-desk-mcp` is a stdio MCP server, built on the
-official Python `mcp` SDK, exposing `search_opportunities`, `get_opportunity_details`,
-`get_activity_history` and `create_task`. The reads are annotated read-only. `create_task` keeps the
-agent's guardrails: no edit or delete path, a refusal when an open agent Task already exists,
-`DRY_RUN` honoured, and every call audited in `tool_writes`. The repo ships a project-scoped
-`.mcp.json` for Claude Code; setup for both clients is in [docs/mcp.md](docs/mcp.md).
+### MCP: the same tools in Claude Desktop and Claude Code
+
+`deal-desk-mcp` is a stdio MCP server built on the official Python `mcp` SDK (pinned to 2.3.0). It
+serves `search_opportunities`, `get_opportunity_details`, `get_activity_history` and `create_task`
+from [`tools.py`](src/deal_desk/tools.py), the same definitions the agent uses, and validates every
+call against those schemas.
+
+**It shares the agent's guardrails:**
+- It's read-only by default. `create_task` is hidden and refused unless `MCP_ALLOW_WRITES=true`.
+- When writes are enabled, `create_task` goes through the same write path as the runner and the
+  review queue (`guarded_create_task`): the open-Task idempotency check, `DRY_RUN`, the
+  `[Deal Desk Agent]` subject prefix, and the least-privilege client with no edit or delete.
+- Every write is audited in the `tool_writes` table.
+
+**Claude Desktop on Windows:** add this to `%APPDATA%\Claude\claude_desktop_config.json`, then
+restart Claude Desktop.
+- `command` is the full path printed by `where uv`. Claude Desktop doesn't reliably see your shell's PATH.
+- `--directory` makes the server start in the repo, so it finds `.env`.
+
+```json
+{
+  "mcpServers": {
+    "deal-desk": {
+      "command": "C:\\Users\\YOU\\AppData\\Roaming\\Python\\Python311\\Scripts\\uv.exe",
+      "args": ["--directory", "C:\\path\\to\\deal-desk-agent", "run", "deal-desk-mcp"]
+    }
+  }
+}
+```
+
+To allow writes, add `"env": {"MCP_ALLOW_WRITES": "true"}` to the `deal-desk` entry. `DRY_RUN` in
+`.env` still decides whether anything is actually written. Claude Code users get a project-scoped
+[`.mcp.json`](.mcp.json); more detail is in [docs/mcp.md](docs/mcp.md).
 
 **Deploy to your own GCP project:** run [`scripts/gcp_setup.sh`](scripts/gcp_setup.sh) once in Cloud
 Shell. It enables the APIs, creates the budget alert, Artifact Registry with a cleanup policy, the

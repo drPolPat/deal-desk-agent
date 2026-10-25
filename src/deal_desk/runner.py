@@ -41,6 +41,24 @@ def task_fields(a: DealAssessment, today: date, run_id: str, prompt_version: str
             "due_date": today + timedelta(days=a.task_due_in_days)}
 
 
+class AlreadyActioned(Exception):
+    """This app already left an open Task on the opportunity."""
+
+
+def guarded_create_task(sf: SalesforceClient, settings: Settings, opportunity_id: str, *,
+                        subject: str, description: str, due_date: date) -> str | None:
+    """The one write path, shared by the runner, the review queue and the MCP server.
+
+    Idempotency check, then DRY_RUN, then SalesforceClient.create_task (which adds the
+    "[Deal Desk Agent]" prefix and is never retried). Returns the Task Id, or None in dry run.
+    """
+    if sf.has_open_agent_task(opportunity_id):
+        raise AlreadyActioned("this opportunity already has an open Deal Desk Agent task")
+    if settings.dry_run:
+        return None
+    return sf.create_task(opportunity_id, subject=subject, description=description, due_date=due_date)
+
+
 def decide(result: AgentResult, settings: Settings, today: date) -> Decision:
     return route(result.assessment, result.error, result.opportunity, result.activities,
                  today=today, confidence_threshold=settings.confidence_threshold,
@@ -122,10 +140,13 @@ def run(settings: Settings, sf: SalesforceClient, llm: anthropic.Anthropic, stor
                                               "opportunity_id": opp["Id"]}})
                 continue
             task_id = None
-            if decision.action == "auto_write" and not settings.dry_run:
+            if decision.action == "auto_write":
                 try:
                     fields = task_fields(result.assessment, today, run_id, settings.prompt_version)
-                    task_id = sf.create_task(opp["Id"], **fields)
+                    task_id = guarded_create_task(sf, settings, opp["Id"], **fields)
+                except AlreadyActioned:  # another writer (review queue, MCP) got there since the pre-check
+                    decision = Decision("already_actioned", ["open Deal Desk Agent task already exists"],
+                                        decision.flags)
                 except SalesforceUnavailable as exc:  # not retried (see create_task): a human decides
                     decision = Decision("human_review", [f"task write failed: {exc}"], decision.flags)
             row = audit_row(run_id, result, decision, settings, task_id)

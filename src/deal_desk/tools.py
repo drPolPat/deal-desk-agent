@@ -1,5 +1,9 @@
-"""Tool definitions given to the model. Read-only on purpose: the agent never gets a write tool;
-its only write (create_task) is made by routing code after the guardrails pass or a human approves."""
+"""The one set of Salesforce tool definitions (name, description, JSON schema).
+
+The agent gets READ_TOOLS only: it never holds a write tool, and its writes are made by routing
+code after the guardrails pass or a human approves. The MCP server serves MCP_TOOLS, these same
+definitions, with create_task behind an opt-in flag.
+"""
 
 from typing import Any
 
@@ -30,3 +34,39 @@ READ_TOOLS: list[dict[str, Any]] = [
         },
     },
 ]
+
+SEARCH_TOOL: dict[str, Any] = {
+    "name": "search_opportunities",
+    "description": "List open opportunities, oldest activity first (never-touched deals first). "
+    "Optional filters: exact stage name and minimum amount.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "stage": {"type": "string", "description": "Exact StageName, e.g. 'Proposal/Price Quote'"},
+            "min_amount": {"type": "number", "minimum": 0},
+            "limit": {"type": "integer", "minimum": 1, "maximum": 200, "default": 25},
+        },
+        "additionalProperties": False,
+    },
+}
+
+CREATE_TASK_TOOL: dict[str, Any] = {
+    "name": "create_task",
+    "description": "Create one open follow-up Task on an opportunity, prefixed '[Deal Desk Agent]'. "
+    "The only write this app can make: it never edits or deletes records, refuses if this app "
+    "already has an open Task on the opportunity, and writes nothing in dry run.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "opportunity_id": _OPP_ID,
+            "subject": {"type": "string", "minLength": 3, "maxLength": 200},
+            "description": {"type": "string", "minLength": 10, "maxLength": 5000},
+            "due_date": {"type": "string", "format": "date",
+                         "description": "ISO date, today or within the next 90 days"},
+        },
+        "required": ["opportunity_id", "subject", "description", "due_date"],
+        "additionalProperties": False,
+    },
+}
+
+MCP_TOOLS: list[dict[str, Any]] = [SEARCH_TOOL, *READ_TOOLS, CREATE_TASK_TOOL]

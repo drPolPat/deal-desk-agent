@@ -9,7 +9,7 @@ from typing import Any
 
 from deal_desk.audit import AuditStore
 from deal_desk.config import Settings
-from deal_desk.runner import task_fields
+from deal_desk.runner import AlreadyActioned, guarded_create_task, task_fields
 from deal_desk.salesforce import SalesforceClient, SalesforceUnavailable
 from deal_desk.schemas import DealAssessment
 
@@ -51,9 +51,6 @@ def approve(store: AuditStore, sf: SalesforceClient, settings: Settings, run_id:
             note: str | None = None, today: date | None = None) -> dict[str, Any]:
     today = today or date.today()
     item = _find(store, run_id, opportunity_id)
-    if sf.has_open_agent_task(opportunity_id):
-        raise ReviewError(409, "this opportunity already has an open Deal Desk Agent task")
-
     raw = item.get("assessment")
     assessment = DealAssessment.model_validate(raw) if raw else None
     if subject or description:
@@ -70,10 +67,12 @@ def approve(store: AuditStore, sf: SalesforceClient, settings: Settings, run_id:
         raise ReviewError(422, "the model produced no valid output; provide subject and description")
 
     task_id = None
-    if fields and not settings.dry_run:
+    if fields:
         fields["description"] += f"\n\nApproved by {settings.reviewer_name} in the review queue."
         try:
-            task_id = sf.create_task(opportunity_id, **fields)
+            task_id = guarded_create_task(sf, settings, opportunity_id, **fields)
+        except AlreadyActioned as exc:
+            raise ReviewError(409, str(exc)) from exc
         except SalesforceUnavailable as exc:  # nothing recorded: the item stays pending
             raise ReviewError(502, f"Salesforce write failed, item is still pending: {exc}") from exc
     return _record(store, settings, item, "approve", task_id=task_id, note=note,

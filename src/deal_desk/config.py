@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     stale_days: int = 30
 
     dry_run: bool = True  # route and audit, but never write to Salesforce
+    mcp_allow_writes: bool = False  # MCP server is read-only unless this is set (create_task hidden)
     audit_dir: str = "audit_local"
     # Set both to use BigQuery for the audit log and review queue (Cloud Run); else JSONL in audit_dir.
     gcp_project: str = ""
