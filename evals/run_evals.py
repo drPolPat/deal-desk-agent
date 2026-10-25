@@ -36,7 +36,7 @@ from deal_desk.costs import cost_usd
 from deal_desk.runner import decide
 
 HERE = Path(__file__).parent
-SUITES = {"regression": "scenarios.json", "borderline": "borderline.json"}
+SUITES = {"regression": "scenarios.json", "borderline": "borderline.json", "holdout": "holdout.json"}
 
 CANNED_BASE = {
     "status": "at_risk", "risk_reasons": ["No activity in over 30 days"], "confidence": 0.9,

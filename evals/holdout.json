@@ -1,0 +1,75 @@
+{
+  "description": "Holdout for the borderline suite: same patterns as the v2 prompt fixes target, different surface details. Written and committed BEFORE prompt v2; never used to tune it. Report separately.",
+  "today": "2026-10-25",
+  "defaults": {
+    "opportunity": {
+      "Name": "Holdout deal",
+      "StageName": "Value Proposition",
+      "Amount": 72000,
+      "CloseDate": "2027-01-20",
+      "Probability": 50,
+      "LastActivityDate": "2026-10-20",
+      "AccountId": "001HOLD00000001",
+      "Type": "New Business",
+      "LeadSource": "Partner",
+      "NextStep": null,
+      "Description": null,
+      "ForecastCategoryName": "Pipeline",
+      "IsClosed": false,
+      "CreatedDate": "2026-07-01T09:00:00.000+0000",
+      "LastModifiedDate": "2026-10-20T09:00:00.000+0000",
+      "Owner": {"Name": "Jordan Reyes"},
+      "Account": {"Name": "Brightwater Utilities", "Industry": "Utilities"},
+      "OpportunityContactRoles": [
+        {"Role": "Decision Maker", "IsPrimary": true,
+         "Contact": {"Name": "Marco Lindgren", "Title": "Head of Field Operations", "Email": "marco.lindgren@example.com"}},
+        {"Role": "Technical Buyer", "IsPrimary": false,
+         "Contact": {"Name": "Aisha Bello", "Title": "IT Architect", "Email": "aisha.bello@example.com"}}
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "id": "HO1_overdue_demo_no_outcome",
+      "category": "misleading_activity",
+      "rationale": "The product demo was due 2026-10-16 and is still Not Started with nothing logged since; 23 days is under the rule, so only the model can catch it.",
+      "opportunity": {"Name": "Brightwater - Crew dispatch", "LastActivityDate": "2026-10-02",
+                      "NextStep": "Product demo for the operations team"},
+      "activities": [{"Subject": "Product demo with operations team", "Status": "Not Started", "ActivityDate": "2026-10-16"},
+                     {"Subject": "Intro call with Marco", "Status": "Completed", "ActivityDate": "2026-10-02"}],
+      "expect": {"status_in": ["at_risk"], "decision_in": ["auto_write", "human_review"]}
+    },
+    {
+      "id": "HO2_28_days_quiet_workshop_pending",
+      "category": "thresholds",
+      "rationale": "Two days under the 30-day rule with a sensible pending step; healthy, and a confident 'healthy' is the best answer.",
+      "opportunity": {"Name": "Brightwater - Asset inspections", "LastActivityDate": "2026-09-27",
+                      "NextStep": "Schedule technical workshop with Aisha"},
+      "activities": [{"Subject": "Security questionnaire returned", "Status": "Completed", "ActivityDate": "2026-09-27"},
+                     {"Subject": "Discovery call", "Status": "Completed", "ActivityDate": "2026-09-10"}],
+      "expect": {"decision_in": ["no_action", "human_review"], "best": "no_action"}
+    },
+    {
+      "id": "HO3_no_contact_until_board_meets",
+      "category": "intentional_quiet",
+      "rationale": "The buyer asked for no calls or emails until their board meets on 2026-11-20; outreach breaks an explicit request, so only a human review is acceptable.",
+      "opportunity": {"Name": "Brightwater - Meter data platform", "LastActivityDate": "2026-09-15",
+                      "CloseDate": "2026-12-18", "NextStep": "Wait for board decision"},
+      "activities": [{"Subject": "Call with Marco", "Status": "Completed", "ActivityDate": "2026-09-15",
+                      "Description": "Marco: no calls or emails until our board meets on 2026-11-20. The board decides on all new vendor contracts at that meeting."}],
+      "expect": {"decision_in": ["human_review"], "best": "human_review"}
+    },
+    {
+      "id": "HO4_architecture_board_cadence_meeting_booked",
+      "category": "looks_risky_but_healthy",
+      "rationale": "26 quiet days fit the customer's 4-6 week architecture-board cadence, and the next session is booked for 2026-11-02.",
+      "opportunity": {"Name": "Brightwater - Grid analytics platform", "StageName": "Id. Decision Makers",
+                      "Amount": 88000, "LastActivityDate": "2026-09-29", "CloseDate": "2027-04-30",
+                      "NextStep": "Architecture board review 2026-11-02",
+                      "Description": "Multi-year platform deal. The customer reviews vendors at their architecture board every 4-6 weeks; we present at each session."},
+      "activities": [{"Kind": "Event", "Subject": "Architecture board review with CIO", "ActivityDate": "2026-11-02"},
+                     {"Subject": "Architecture board session", "Status": "Completed", "ActivityDate": "2026-09-29"}],
+      "expect": {"status_in": ["healthy"], "decision_in": ["no_action"], "best": "no_action"}
+    }
+  ]
+}

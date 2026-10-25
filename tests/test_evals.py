@@ -38,6 +38,18 @@ def test_borderline_fixtures_trigger_the_rules_their_labels_assume():
         assert rule_flags(opp, TODAY, 30) == flags, sid
 
 
+def test_holdout_fixtures_and_labels():
+    holdout = json.loads((EVALS / "holdout.json").read_text(encoding="utf-8"))
+    expected = {"HO1_overdue_demo_no_outcome": [], "HO2_28_days_quiet_workshop_pending": [],
+                "HO3_no_contact_until_board_meets": ["stale"],
+                "HO4_architecture_board_cadence_meeting_booked": []}
+    for n, sc in enumerate(holdout["scenarios"], 1):
+        opp, _ = run_evals.build(sc, n, holdout["defaults"])
+        assert rule_flags(opp, TODAY, 30) == expected[sc["id"]], sc["id"]
+        assert sc["rationale"] and sc["expect"].get("best") in (None, *sc["expect"]["decision_in"])
+    assert {s["id"] for s in holdout["scenarios"]}.isdisjoint(s["id"] for s in BORDERLINE["scenarios"])
+
+
 def test_borderline_labels_are_well_formed():
     decisions = {"auto_write", "human_review", "no_action"}
     ids = [s["id"] for s in BORDERLINE["scenarios"]]
