@@ -38,9 +38,9 @@
         "pass_rate": 1.0
       }
     },
-    "cost_usd": 0.1515,
-    "latency_p50_ms": 6157,
-    "latency_p95_ms": 7742
+    "cost_usd": 0.1106,
+    "latency_p50_ms": 5870,
+    "latency_p95_ms": 6712
   },
   "results": [
     {
@@ -54,14 +54,14 @@
       "reasons": [],
       "confidence": 0.85,
       "error": null,
-      "latency_ms": 6059,
+      "latency_ms": 5925,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 690,
-        "cache_creation_input_tokens": 758,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 679,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5892
       },
-      "cost_usd": 0.009833799999999998
+      "cost_usd": 0.0073912
     },
     {
       "id": "S02_stale_100_days",
@@ -74,14 +74,14 @@
       "reasons": [],
       "confidence": 0.9,
       "error": null,
-      "latency_ms": 6934,
+      "latency_ms": 6504,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 785,
-        "cache_creation_input_tokens": 876,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 781,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6010
       },
-      "cost_usd": 0.0110788
+      "cost_usd": 0.008423
     },
     {
       "id": "S03_no_activity_ever",
@@ -94,14 +94,14 @@
       "reasons": [],
       "confidence": 0.9,
       "error": null,
-      "latency_ms": 6215,
+      "latency_ms": 5986,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 722,
-        "cache_creation_input_tokens": 652,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 699,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5786
       },
-      "cost_usd": 0.0098888
+      "cost_usd": 0.007580600000000001
     },
     {
       "id": "S04_past_close_date",
@@ -114,14 +114,14 @@
       "reasons": [],
       "confidence": 0.85,
       "error": null,
-      "latency_ms": 6273,
+      "latency_ms": 5584,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 654,
-        "cache_creation_input_tokens": 770,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 666,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5904
       },
-      "cost_usd": 0.0095038
+      "cost_usd": 0.0072624
     },
     {
       "id": "S05_champion_leaving",
@@ -134,14 +134,14 @@
       "reasons": [],
       "confidence": 0.9,
       "error": null,
-      "latency_ms": 7742,
+      "latency_ms": 6406,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 789,
-        "cache_creation_input_tokens": 819,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 773,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5953
       },
-      "cost_usd": 0.0109763
+      "cost_usd": 0.008337299999999999
     },
     {
       "id": "H01_recent_activity",
@@ -154,14 +154,14 @@
       "reasons": [],
       "confidence": 0.9,
       "error": null,
-      "latency_ms": 3793,
+      "latency_ms": 3728,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 392,
-        "cache_creation_input_tokens": 880,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 414,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6014
       },
-      "cost_usd": 0.0071588
+      "cost_usd": 0.0047534
     },
     {
       "id": "H02_negotiation_active",
@@ -174,14 +174,14 @@
       "reasons": [],
       "confidence": 0.93,
       "error": null,
-      "latency_ms": 3707,
+      "latency_ms": 3974,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 391,
-        "cache_creation_input_tokens": 985,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 409,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6119
       },
-      "cost_usd": 0.0074113
+      "cost_usd": 0.0047139
     },
     {
       "id": "H03_early_stage_on_track",
@@ -194,14 +194,14 @@
       "reasons": [],
       "confidence": 0.85,
       "error": null,
-      "latency_ms": 3823,
+      "latency_ms": 3668,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 382,
-        "cache_creation_input_tokens": 770,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 392,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5904
       },
-      "cost_usd": 0.0067838
+      "cost_usd": 0.004522399999999999
     },
     {
       "id": "H04_high_value_healthy",
@@ -212,16 +212,16 @@
       "status": "healthy",
       "decision": "no_action",
       "reasons": [],
-      "confidence": 0.92,
+      "confidence": 0.9,
       "error": null,
-      "latency_ms": 3776,
+      "latency_ms": 3666,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 413,
-        "cache_creation_input_tokens": 882,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 389,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6016
       },
-      "cost_usd": 0.0073738
+      "cost_usd": 0.0045036
     },
     {
       "id": "H05_steady_cadence",
@@ -234,14 +234,14 @@
       "reasons": [],
       "confidence": 0.9,
       "error": null,
-      "latency_ms": 3712,
+      "latency_ms": 3701,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 400,
-        "cache_creation_input_tokens": 990,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 393,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 6124
       },
-      "cost_usd": 0.0075138
+      "cost_usd": 0.004554399999999999
     },
     {
       "id": "V01_stale_150k",
@@ -254,16 +254,16 @@
       "reasons": [
         "high value 150,000 >= 100,000"
       ],
-      "confidence": 0.88,
+      "confidence": 0.85,
       "error": null,
-      "latency_ms": 6009,
+      "latency_ms": 5815,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 719,
-        "cache_creation_input_tokens": 773,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 716,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5907
       },
-      "cost_usd": 0.0101613
+      "cost_usd": 0.0077627
     },
     {
       "id": "V02_stale_640k",
@@ -276,16 +276,16 @@
       "reasons": [
         "high value 640,000 >= 100,000"
       ],
-      "confidence": 0.88,
+      "confidence": 0.85,
       "error": null,
-      "latency_ms": 6099,
+      "latency_ms": 5749,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 745,
-        "cache_creation_input_tokens": 765,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 686,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5899
       },
-      "cost_usd": 0.010401299999999999
+      "cost_usd": 0.0074619
     },
     {
       "id": "V03_past_close_1_2m",
@@ -300,14 +300,14 @@
       ],
       "confidence": 0.85,
       "error": null,
-      "latency_ms": 6216,
+      "latency_ms": 6076,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 743,
-        "cache_creation_input_tokens": 778,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 700,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5912
       },
-      "cost_usd": 0.010413799999999999
+      "cost_usd": 0.0076032
     },
     {
       "id": "G01_invented_custom_field",
@@ -410,14 +410,14 @@
       ],
       "confidence": 0.85,
       "error": null,
-      "latency_ms": 6365,
+      "latency_ms": 6712,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 776,
-        "cache_creation_input_tokens": 775,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 804,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5909
       },
-      "cost_usd": 0.010736299999999999
+      "cost_usd": 0.0086429
     },
     {
       "id": "M02_no_contacts",
@@ -430,16 +430,16 @@
       "reasons": [
         "no contact to send the follow-up to"
       ],
-      "confidence": 0.9,
+      "confidence": 0.85,
       "error": null,
-      "latency_ms": 7817,
+      "latency_ms": 6451,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 805,
-        "cache_creation_input_tokens": 706,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 747,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5840
       },
-      "cost_usd": 0.010853799999999999
+      "cost_usd": 0.008066
     },
     {
       "id": "M03_malformed_model_output",
@@ -454,7 +454,7 @@
       ],
       "confidence": null,
       "error": "opportunity_id: Field required; risk_reasons: Field required; confidence: Field required; evidence: Field required; next_step: Field required; follow_up_email: Field required; task_due_in_days: Field required",
-      "latency_ms": 2,
+      "latency_ms": 0,
       "tokens": {
         "input_tokens": 0,
         "output_tokens": 0,
@@ -476,14 +476,14 @@
       ],
       "confidence": 0.9,
       "error": null,
-      "latency_ms": 6412,
+      "latency_ms": 6790,
       "tokens": {
         "input_tokens": 6,
-        "output_tokens": 828,
-        "cache_creation_input_tokens": 834,
-        "cache_read_input_tokens": 5134
+        "output_tokens": 844,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 5968
       },
-      "cost_usd": 0.011403799999999999
+      "cost_usd": 0.0090488
     }
   ]
 }

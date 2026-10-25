@@ -1,12 +1,13 @@
 from collections.abc import Mapping
 
 # USD per million tokens: input, output, 5-minute cache write, cache read.
-# shortcut: copied from the bundled Claude API reference (cached 2026-10-06); re-check against
-# anthropic.com/pricing before publishing numbers (M3 model comparison).
+# Verified 2026-10-25 against platform.claude.com/docs/en/about-claude/pricing.
 PRICES: dict[str, tuple[float, float, float, float]] = {
     "claude-opus-5-5": (4.00, 20.00, 5.00, 0.20),
-    "claude-sonnet-5-5": (2.00, 10.00, 2.50, 0.20),
-    "claude-haiku-5-5": (0.10, 0.50, 0.125, 0.01),  # prompts up to 100K tokens
+    "claude-sonnet-5-5": (2.00, 10.00, 2.50, 0.10),
+    # shortcut: the <=100K-token prompt tier; prompts here are ~6K tokens. Price the >100K tier
+    # ($0.50/$2.50) if prompts ever grow that large.
+    "claude-haiku-5-5": (0.10, 0.50, 0.125, 0.01),
 }
 
 
