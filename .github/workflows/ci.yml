@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked --python 3.12
+      - name: Lint
+        run: uv run ruff check .
+      - name: Unit tests
+        run: uv run pytest -q
+
+  evals:
+    # Calls Claude (~$0.15 per run on claude-sonnet-5-5), so only for main and pull requests.
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      MODEL: claude-sonnet-5-5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked --python 3.12
+      - name: Require the API key on main
+        if: env.ANTHROPIC_API_KEY == '' && github.event_name == 'push'
+        run: |
+          echo "::error::ANTHROPIC_API_KEY secret is not set; the eval gate cannot run."
+          exit 1
+      - name: Eval gate (fails below 90% overall or 80% in any category)
+        if: env.ANTHROPIC_API_KEY != ''
+        run: uv run python evals/run_evals.py --min-pass 0.9 --min-category 0.8
+      - name: Upload eval results
+        if: always() && env.ANTHROPIC_API_KEY != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: evals/results/

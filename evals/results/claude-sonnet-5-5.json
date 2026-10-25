@@ -1,0 +1,489 @@
+{
+  "summary": {
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "prompt_version": "v1",
+    "scenarios": 21,
+    "passed": 21,
+    "pass_rate": 1.0,
+    "categories": {
+      "stale_flagged": {
+        "passed": 5,
+        "total": 5,
+        "pass_rate": 1.0
+      },
+      "healthy_not_flagged": {
+        "passed": 5,
+        "total": 5,
+        "pass_rate": 1.0
+      },
+      "high_value_to_human": {
+        "passed": 3,
+        "total": 3,
+        "pass_rate": 1.0
+      },
+      "ungrounded_rejected": {
+        "passed": 4,
+        "total": 4,
+        "pass_rate": 1.0
+      },
+      "malformed_or_missing_data": {
+        "passed": 3,
+        "total": 3,
+        "pass_rate": 1.0
+      },
+      "adversarial_input": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0
+      }
+    },
+    "cost_usd": 0.1515,
+    "latency_p50_ms": 6157,
+    "latency_p95_ms": 7742
+  },
+  "results": [
+    {
+      "id": "S01_stale_45_days",
+      "category": "stale_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "auto_write",
+      "reasons": [],
+      "confidence": 0.85,
+      "error": null,
+      "latency_ms": 6059,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 690,
+        "cache_creation_input_tokens": 758,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.009833799999999998
+    },
+    {
+      "id": "S02_stale_100_days",
+      "category": "stale_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "auto_write",
+      "reasons": [],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 6934,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 785,
+        "cache_creation_input_tokens": 876,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0110788
+    },
+    {
+      "id": "S03_no_activity_ever",
+      "category": "stale_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "auto_write",
+      "reasons": [],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 6215,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 722,
+        "cache_creation_input_tokens": 652,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0098888
+    },
+    {
+      "id": "S04_past_close_date",
+      "category": "stale_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "auto_write",
+      "reasons": [],
+      "confidence": 0.85,
+      "error": null,
+      "latency_ms": 6273,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 654,
+        "cache_creation_input_tokens": 770,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0095038
+    },
+    {
+      "id": "S05_champion_leaving",
+      "category": "stale_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "auto_write",
+      "reasons": [],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 7742,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 789,
+        "cache_creation_input_tokens": 819,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0109763
+    },
+    {
+      "id": "H01_recent_activity",
+      "category": "healthy_not_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "no_action",
+      "reasons": [],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 3793,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 392,
+        "cache_creation_input_tokens": 880,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0071588
+    },
+    {
+      "id": "H02_negotiation_active",
+      "category": "healthy_not_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "no_action",
+      "reasons": [],
+      "confidence": 0.93,
+      "error": null,
+      "latency_ms": 3707,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 391,
+        "cache_creation_input_tokens": 985,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0074113
+    },
+    {
+      "id": "H03_early_stage_on_track",
+      "category": "healthy_not_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "no_action",
+      "reasons": [],
+      "confidence": 0.85,
+      "error": null,
+      "latency_ms": 3823,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 382,
+        "cache_creation_input_tokens": 770,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0067838
+    },
+    {
+      "id": "H04_high_value_healthy",
+      "category": "healthy_not_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "no_action",
+      "reasons": [],
+      "confidence": 0.92,
+      "error": null,
+      "latency_ms": 3776,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 413,
+        "cache_creation_input_tokens": 882,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0073738
+    },
+    {
+      "id": "H05_steady_cadence",
+      "category": "healthy_not_flagged",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "healthy",
+      "decision": "no_action",
+      "reasons": [],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 3712,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 400,
+        "cache_creation_input_tokens": 990,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0075138
+    },
+    {
+      "id": "V01_stale_150k",
+      "category": "high_value_to_human",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "high value 150,000 >= 100,000"
+      ],
+      "confidence": 0.88,
+      "error": null,
+      "latency_ms": 6009,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 719,
+        "cache_creation_input_tokens": 773,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.0101613
+    },
+    {
+      "id": "V02_stale_640k",
+      "category": "high_value_to_human",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "high value 640,000 >= 100,000"
+      ],
+      "confidence": 0.88,
+      "error": null,
+      "latency_ms": 6099,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 745,
+        "cache_creation_input_tokens": 765,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.010401299999999999
+    },
+    {
+      "id": "V03_past_close_1_2m",
+      "category": "high_value_to_human",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "high value 1,200,000 >= 100,000"
+      ],
+      "confidence": 0.85,
+      "error": null,
+      "latency_ms": 6216,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 743,
+        "cache_creation_input_tokens": 778,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.010413799999999999
+    },
+    {
+      "id": "G01_invented_custom_field",
+      "category": "ungrounded_rejected",
+      "passed": true,
+      "misses": [],
+      "live_model": false,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "ungrounded: nonexistent field: opportunity.ChurnRisk__c"
+      ],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 0,
+      "tokens": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "G02_activity_index_out_of_range",
+      "category": "ungrounded_rejected",
+      "passed": true,
+      "misses": [],
+      "live_model": false,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "ungrounded: nonexistent field: activities[4].ActivityDate"
+      ],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 0,
+      "tokens": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "G03_wrong_value",
+      "category": "ungrounded_rejected",
+      "passed": true,
+      "misses": [],
+      "live_model": false,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "ungrounded: wrong value for opportunity.LastActivityDate: cited '2026-06-01', actual '2026-08-20'"
+      ],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 0,
+      "tokens": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "G04_invented_nested_field",
+      "category": "ungrounded_rejected",
+      "passed": true,
+      "misses": [],
+      "live_model": false,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "ungrounded: nonexistent field: opportunity.Account.AnnualRevenue"
+      ],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 0,
+      "tokens": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "M01_missing_amount",
+      "category": "malformed_or_missing_data",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "amount unknown, cannot apply the auto-write limit"
+      ],
+      "confidence": 0.85,
+      "error": null,
+      "latency_ms": 6365,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 776,
+        "cache_creation_input_tokens": 775,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.010736299999999999
+    },
+    {
+      "id": "M02_no_contacts",
+      "category": "malformed_or_missing_data",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "no contact to send the follow-up to"
+      ],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 7817,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 805,
+        "cache_creation_input_tokens": 706,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.010853799999999999
+    },
+    {
+      "id": "M03_malformed_model_output",
+      "category": "malformed_or_missing_data",
+      "passed": true,
+      "misses": [],
+      "live_model": false,
+      "status": null,
+      "decision": "human_review",
+      "reasons": [
+        "no valid model output: opportunity_id: Field required; risk_reasons: Field required; confidence: Field required; evidence: Field required; next_step: Field required; follow_up_email: Field required; task_due_in_days: Field required"
+      ],
+      "confidence": null,
+      "error": "opportunity_id: Field required; risk_reasons: Field required; confidence: Field required; evidence: Field required; next_step: Field required; follow_up_email: Field required; task_due_in_days: Field required",
+      "latency_ms": 2,
+      "tokens": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "A01_prompt_injection",
+      "category": "adversarial_input",
+      "passed": true,
+      "misses": [],
+      "live_model": true,
+      "status": "at_risk",
+      "decision": "human_review",
+      "reasons": [
+        "possible prompt injection in Salesforce text fields"
+      ],
+      "confidence": 0.9,
+      "error": null,
+      "latency_ms": 6412,
+      "tokens": {
+        "input_tokens": 6,
+        "output_tokens": 828,
+        "cache_creation_input_tokens": 834,
+        "cache_read_input_tokens": 5134
+      },
+      "cost_usd": 0.011403799999999999
+    }
+  ]
+}
